@@ -1,0 +1,152 @@
+# Siege: waves of mobs around the spot, then a boss with phases. /eventide start siege
+
+name: "<#FF6B6B>Осада</#FF6B6B>"
+
+schedule: ["21:30"]
+min-online: 3
+
+location:
+  world: world
+  center: [0, 0]
+  radius: [200, 1200]
+  # A spot that fits the whole fortress is rarer than a spot for a crate, so more tries.
+  attempts: 40
+
+# Built on the spot when the event starts. The ground under it is saved first and put back when the event
+# ends; while it runs, players cannot break, build or open containers in it.
+structure:
+  # File in the structures folder: a vanilla structure (.nbt), as saved by a structure block.
+  file: siege-fortress.nbt
+  # Block of the build that lands on the spot, [x, y, z] from its corner: the middle of the yard,
+  # one block above the floor. Without it, the middle of the build at its lowest layer.
+  origin: [23, 4, 23]
+  # The ground under the build is evened out and put back after the event. The floor goes to the usual
+  # ground height of the area; ground up to fill-depth blocks lower is filled up to the build, hills up
+  # to cut-height blocks higher are cut away inside it. One block in twenty may stray further.
+  fill-depth: 6
+  cut-height: 6
+  # Share of the area that may be water: ponds and streams under the build are covered by it.
+  max-water: 20%
+
+loot-table: default
+
+# Ends as soon as the boss dies, or if it disappears without dying (e.g. removed by another plugin).
+finish-on: [boss-killed, boss-lost]
+
+rewards:
+  places:
+    1: ["xp: 1000", "key: epic"]
+    2: ["xp: 500", "key: rare"]
+    3: ["xp: 250", "key: rare"]
+  participation: ["xp: 100", "key: common"]
+
+effects:
+  finish: event-victory
+
+stages:
+  - actions:
+      # A beam over the spot and the distance to it in the action bar, until the event ends.
+      - type: marker
+        effect: event-marker
+        every: 2s
+        # Players within "radius" blocks see the distance; it is hidden once they are closer than "hide-within".
+        compass: {radius: 160, hide-within: 8}
+      - type: broadcast
+        message: "<accent>Ивенты</accent> <dark_gray>»</dark_gray> <gray>Через <white>5 минут</white> на <white><x> <z></white> начнётся <event><gray>. Отбейте волны и убейте главаря."
+      - type: effect
+        effect: event-announce
+      - type: countdown
+        duration: 5m
+        title: "<event> <gray>через <white><time>"
+        color: red
+
+  - after: 5m
+    actions:
+      - type: waves
+        # Mobs appear within this many blocks of the spot.
+        spread: 14
+        # Break between a cleared wave and the next one.
+        pause: 10s
+        points-per-kill: 1
+        # true = mobs drop their usual loot and experience.
+        vanilla-drops: false
+        # false = no wave messages in chat / no signals (for minions inside a boss phase).
+        messages: true
+        signals: true
+        # Mobs glow through walls: a colour (red, gold, aqua, light_purple, ...), true or false.
+        # A wave in the list can set its own "glow".
+        glow: red
+        # Glow only once this few mobs of a wave are left; 0 = from the start.
+        glow-when-left: 0
+        bar: {color: red, radius: 96}
+        effects:
+          wave-start: wave-start
+          spawn: guard-spawn
+          death: guard-death
+        # Each wave: which mobs and how many, and optionally name, health, damage, speed,
+        # scale and equipment (main-hand, off-hand, head, chest, legs, feet) for all of them.
+        list:
+          - mobs: {zombie: 6, skeleton: 2}
+          - mobs: {zombie: 6, skeleton: 4, spider: 2}
+            health: 30
+          - mobs: {husk: 6, stray: 4, vindicator: 2}
+            name: "<red>Осаждающий"
+            health: 35
+            equipment:
+              head: iron_helmet
+
+  - wait-for: waves-cleared
+    # Waves not cleared in this time: the event ends without a boss. Required with wait-for.
+    timeout: 15m
+    after: 5s
+    actions:
+      - type: boss
+        entity: wither_skeleton
+        name: "<dark_red><bold>Главарь осады"
+        glow: dark_red
+        health: 400
+        damage: 10
+        speed: 0.28
+        scale: 1.5
+        equipment:
+          main-hand:
+            material: netherite_sword
+            enchantments: {sharpness: 3}
+          head: netherite_helmet
+        # Points: "damage" is split between everyone by damage dealt, "kill" goes to the last hit.
+        points: {damage: 60, kill: 15}
+        # The boss is pulled back if lured further than this from the spot. 0 = never.
+        leash: 32
+        bar: {color: red, overlay: notched_10, radius: 96}
+        effects:
+          spawn: boss-spawn
+          death: boss-death
+        # Each phase starts when health drops to "at". It can change damage and speed,
+        # play an effect and run any stage actions.
+        phases:
+          - at: 60%
+            speed: 0.32
+            effect: boss-phase
+            actions:
+              # Minions: no wave messages and no signals, so the boss fight is not
+              # mistaken for the end of the siege waves.
+              - type: waves
+                spread: 8
+                pause: 1s
+                signals: false
+                messages: false
+                list:
+                  - mobs: {skeleton: 4}
+          - at: 25%
+            damage: 16
+            effect: boss-phase
+            actions:
+              - type: title
+                title: "<dark_red>Ярость"
+                subtitle: "<gray>главарь почти повержен"
+                radius: 96
+
+  - after: 10m
+    actions:
+      - type: broadcast
+        message: "<accent>Ивенты</accent> <dark_gray>»</dark_gray> <gray>Главарь <event> <gray>ушёл. В следующий раз."

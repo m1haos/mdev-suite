@@ -1,0 +1,136 @@
+prefix: "<accent>Events</accent> <dark_gray>»</dark_gray> "
+
+event:
+  finished: "<prefix><event> <gray>is over. Top players:"
+  finished-empty: "<prefix><event> <gray>is over. Nobody made it this time."
+  finished-plain: "<prefix><event> <gray>is over. Thanks to everyone who took part."
+  top-line: "<gray>  <white><place>.</white> <player> <dark_gray>—</dark_gray> <accent><points></accent> pts"
+  stopped: "<prefix><event> <gray>was stopped. No rewards this time."
+
+container:
+  need-key: "<prefix><warning>This cache opens with a key:</warning> <tier><warning>."
+  wrong-key: "<prefix><warning>Wrong key. This one needs a key:</warning> <tier>"
+  opened: "<prefix><success>Cache opened:</success> <tier> <gray>(+<points> pts)"
+  protected: "<prefix><error>This is an event cache and cannot be broken."
+
+region:
+  denied: "<prefix><error>The event <event> <error>is running here; this is not allowed until it ends."
+  command-blocked: "<prefix><error>This command does not work at the event <event><error>."
+
+build:
+  protected: "<prefix><error>The event build cannot be changed while the event runs. The ground comes back as it was afterwards."
+
+airdrop:
+  incoming: "<prefix><gray>A crate is falling here. Step aside."
+  landed: "<prefix><event><gray>: the crate landed at <white><x> <z></white>. Stand next to the crate to open it."
+  hint: "<prefix><gray>Stay next to the crate alone for <white><seconds>s</white> to open it."
+  captured: "<prefix><white><player></white> <gray>opened the airdrop!"
+  bar-waiting: "<event> <gray>— stand next to the crate"
+  bar-capturing: "<event> <gray>— <white><player></white> is opening it <accent><percent>%"
+  bar-contested: "<event> <warning>— several players at the crate, opening paused"
+
+zone:
+  bar-empty: "<event> <gray>— the zone is free. Leader: <white><leader></white> <accent><points>/<goal>"
+  bar-held: "<event> <gray>— <white><holder></white> holds the zone. Leader: <white><leader></white> <accent><points>/<goal>"
+  bar-contested: "<event> <warning>— the zone is contested.</warning> <gray>Leader: <white><leader></white> <accent><points>/<goal>"
+  won: "<prefix><white><player></white> <gray>held the zone to victory!"
+
+marker:
+  compass: "<event> <dark_gray>»</dark_gray> <white><distance> m</white> <accent><arrow>"
+
+waves:
+  started: "<prefix><event> <gray>— wave <white><wave>/<waves></white>!"
+  next: "<prefix><gray>Wave cleared. The next one comes in <white><seconds>s</white>."
+  cleared: "<prefix><success>All waves cleared!"
+  bar: "<event> <gray>— wave <white><wave>/<waves></white>, enemies left: <white><left>"
+
+boss:
+  spawned: "<prefix><boss> <gray>has appeared at <white><x> <z></white>!"
+  phase: "<prefix><boss> <warning>is enraged</warning> <gray>(phase <phase>)"
+  killed: "<prefix><boss> <gray>is defeated! Final blow: <white><player>"
+  bar: "<boss> <gray>— phase <white><phase>"
+
+shop:
+  disabled: "<prefix><gray>Buying keys is turned off on this server."
+  not-for-sale: "<prefix><warning>The <rarity> key is not for sale."
+  no-economy: "<prefix><error>This server has no economy (Vault), keys cannot be bought."
+  not-enough: "<prefix><warning>Not enough money:</warning> the <rarity> key <gray>costs <white><price>"
+  bought: "<prefix><success>Key bought:</success> <rarity> ×<amount> <gray>for <white><price>"
+
+schedule:
+  title: "<accent>Server events"
+  running: "<event> <success>running now</success> <gray>— <white><x> <z></white> <dark_gray>(<world>)</dark_gray>"
+  next: "<event> <gray>— next at <white><time>"
+  manual: "<event> <gray>— started by admins only"
+  empty: "<gray>No events yet."
+  disabled: "<prefix><gray>The event schedule is hidden on this server."
+
+command:
+  starting: "<prefix><gray>Looking for a spot for <event><gray>..."
+  start-failed: "<prefix><error>Could not start <id>:</error> <gray><reason>"
+  already-running: "<prefix><warning><id> is already running."
+  too-many: "<prefix><warning>At most <max> events can run at once (max-active in config.yml)."
+  unknown-loot: "<prefix><error>Event <id> uses loot table <loot>, which is not in the loot folder."
+  unknown-event: "<prefix><error>There is no event <id>. Event files live in the events folder."
+  stopped: "<prefix><gray>Event <white><id></white> stopped."
+  not-running: "<prefix><warning><id> is not running."
+  tp-none: "<prefix><gray>No event is running right now."
+  tp-list: "<prefix><gray>Running events, click one:"
+  tp-line: "<gray>  <event> <dark_gray>—</dark_gray> <white><x> <z></white> <dark_gray>(<world>)"
+  tp-hover: "<gray>Teleport"
+  teleported: "<prefix><gray>You are at <event><gray>."
+  unknown-rarity: "<prefix><error>There is no rarity <rarity> in rarities.yml."
+  keyless-rarity: "<prefix><warning>The <rarity> rarity has no key: its caches open without one."
+  key-given: "<prefix><gray>Gave <white><player></white> a key: <rarity> ×<amount>"
+  reloaded: "<prefix><success>Reloaded.</success> <gray>Events: <white><events></white>, rarities: <white><rarities>"
+
+editor:
+  tables-title: "<accent>Loot tables"
+  table-button: "<white><table></white> <gray>(tiers: <tiers>)"
+  empty: "<gray>No loot tables. Put a file in the loot folder and run /eventide reload."
+  tiers-title: "<accent>Loot:</accent> <white><table>"
+  tier-button: "<tier> <gray>— items: <count>"
+  tier-title: "<tier>"
+  tier-info: "<gray>Rarity <rarity><gray>. Rolls when opened: <white><rolls></white>, points: <white><points></white>, key price: <white><price></white>. Chances are per roll."
+  entry-line: "<gray><index>.</gray> <white><name></white> <dark_gray>·</dark_gray> <gray>weight <white><weight></white>, chance <accent><chance>%</accent>, <white><amount></white> pcs"
+  entry-button: "<gray><index>.</gray> <name>"
+  rewards-only: "Rewards only"
+  add-hand: "<success>+ Item in hand"
+  tier-settings: "Tier settings"
+  entry-title: "<accent>Item <index></accent> <gray>— <tier>"
+  entry-info: "<gray>Chance per roll: <accent><chance>%</accent>. Rolls when opened: <white><rolls></white>. The chance comes from the sum of all weights in the tier."
+  weight-label: "Weight"
+  amount-min-label: "Amount from"
+  amount-max-label: "Amount to"
+  rolls-min-label: "Rolls from"
+  rolls-max-label: "Rolls to"
+  points-label: "Points for opening"
+  settings-title: "<accent>Settings</accent> <tier>"
+  save: "<success>Save"
+  remove: "<error>Remove"
+  remove-title: "<error>Remove item <index>?"
+  remove-question: "<white><name></white> <gray>will be removed from the <tier> <gray>loot. To get it back, add it again."
+  remove-yes: "<error>Remove"
+  remove-no: "Cancel"
+  back: "Back"
+  close: "Close"
+  saved: "<prefix><success>Saved to loot/<file>.</success> <gray>Running events finish with the old loot."
+  added: "<prefix><success>Added:</success> <name><gray>. Set its weight and amount."
+  removed: "<prefix><gray>Item removed from the loot."
+  empty-hand: "<prefix><warning>Hold an item in your main hand."
+  last-entry: "<prefix><warning>This is the last item of the tier; a tier without loot fails to load. Add another one first."
+  save-failed: "<prefix><error>Could not save:</error> <gray><reason>"
+  gone: "<prefix><warning>This table or tier no longer exists. Open /eventide loot again."
+  unsupported: "<prefix><error>The editor needs dialog windows: server and client 1.21.6 or newer."
+  settings-info: "<gray>Rolls and points change for this table only. The cache block, the key and its price belong to the rarity in rarities.yml."
+
+help:
+  header: "<accent>Eventide</accent> <dark_gray>—</dark_gray> <gray>commands"
+  menu: "<white>/eventide</white> <gray>— event schedule. Other names: <white><aliases>"
+  start: "<white>/eventide start <event></white> <gray>— start now. Also: <white><aliases>"
+  stop: "<white>/eventide stop <event></white> <gray>— stop without rewards. Also: <white><aliases>"
+  tp: "<white>/eventide tp [event]</white> <gray>— teleport to a running event, without a name — a list. Also: <white><aliases>"
+  givekey: "<white>/eventide givekey <player> <rarity> [amount]</white> <gray>— give a key. Also: <white><aliases>"
+  buykey: "<white>/eventide buykey <rarity> [amount]</white> <gray>— buy a key. Also: <white><aliases>"
+  loot: "<white>/eventide loot</white> <gray>— loot editor. Also: <white><aliases>"
+  reload: "<white>/eventide reload</white> <gray>— reload settings. Also: <white><aliases>"

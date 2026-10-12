@@ -1,0 +1,106 @@
+# Loot table: what drops from caches of each rarity. Rarities themselves (cache block,
+# points, key) are in rarities.yml; every tier id here must be a rarity from that file.
+#
+# Easiest way to fill a table: /eventide loot in game. Hold an item, press "Item in hand",
+# set weight and amount with sliders. The editor writes to this file; comments inside
+# the loot list of a tier it changed are not kept.
+#
+# Tier fields:
+#   rolls   how many loot entries are rolled when a cache is opened: 3 or 2-4
+#   loot    the entries
+#   name, block, points, effects   optional: override the rarity for this table only
+#
+# Loot entry fields:
+#   item       "material amount" or a full item (material, name, lore, model, glow, enchantments)
+#   item-data  an item saved whole by the editor (enchantments, model, data of other plugins);
+#              "about" next to it is only a hint for people reading the file
+#   amount     number or range like 2-6
+#   rewards    reward lines from MDevCore, given to whoever opened the cache
+#   weight     relative chance within the tier
+
+tiers:
+  common:
+    rolls: 2-3
+    loot:
+      - item: iron_ingot
+        amount: 4-10
+        weight: 30
+      - item: gold_ingot
+        amount: 2-6
+        weight: 20
+      - item: cooked_beef
+        amount: 8-16
+        weight: 25
+      - item: experience_bottle
+        amount: 4-8
+        weight: 15
+      - rewards: ["xp: 100"]
+        weight: 10
+
+  rare:
+    rolls: 3-4
+    loot:
+      - item: diamond
+        amount: 2-5
+        weight: 30
+      - item: emerald
+        amount: 4-10
+        weight: 25
+      - item: golden_apple
+        amount: 1-3
+        weight: 20
+      - item:
+          material: diamond_pickaxe
+          name: "<#5DADE2>Кирка метеорита"
+          enchantments: {efficiency: 4, unbreaking: 3}
+        weight: 10
+      - item: ancient_debris
+        amount: 1-2
+        weight: 15
+
+  epic:
+    rolls: 3-5
+    loot:
+      - item: netherite_ingot
+        amount: 1
+        weight: 15
+      - item: enchanted_golden_apple
+        amount: 1
+        weight: 15
+      - item: totem_of_undying
+        amount: 1
+        weight: 20
+      - item: diamond_block
+        amount: 1-3
+        weight: 30
+      - item:
+          material: netherite_sword
+          name: "<#B084F5>Клинок метеорита"
+          enchantments: {sharpness: 5, fire_aspect: 2, unbreaking: 3}
+        weight: 10
+      - rewards: ["broadcast: <#B084F5><player></#B084F5> <gray>нашёл главный трофей метеорита!"]
+        weight: 10
+
+  airdrop:
+    rolls: 5-7
+    loot:
+      - item: diamond
+        amount: 4-8
+        weight: 25
+      - item: netherite_scrap
+        amount: 1-3
+        weight: 15
+      - item: golden_apple
+        amount: 2-4
+        weight: 20
+      - item: ender_pearl
+        amount: 4-8
+        weight: 20
+      - item: experience_bottle
+        amount: 16-32
+        weight: 15
+      - item: enchanted_golden_apple
+        amount: 1
+        weight: 5
+      - rewards: ["key: rare"]
+        weight: 10

@@ -1,0 +1,47 @@
+config-version: 4
+
+# Other names for /mdevcore. Changes need a server restart.
+command-aliases: [mdc, mcore]
+
+# Colors shared by every M/Dev Studio plugin. Use them in any message as
+# <accent>, <success>, <warning> and <error>. Hex values only.
+palette:
+  accent: "#7FB3FF"
+  success: "#8BD17C"
+  warning: "#F2C14E"
+  error: "#FF6B6B"
+
+# Animations and particles of all M/Dev Studio plugins.
+# The effects themselves live in the effects folder next to this file:
+# edit them there, then /mdevcore reload. Preview any of them with /mdevcore effect <id>.
+effects:
+  # false turns off every effect of every studio plugin at once.
+  enabled: true
+  # Multiplies the number of particles in every effect.
+  # 0.5 for weak servers or many players, 1.5 for showcase servers. Allowed: 0.1 to 3.
+  density: 1.0
+
+
+# Where player statistics are kept (event wins, points and so on).
+# Changes here need a server restart, /mdevcore reload does not reopen the database.
+storage:
+  # sqlite  a file data.db in this folder, nothing to set up
+  # mysql   MySQL or MariaDB, for several servers that share statistics
+  type: sqlite
+
+  # Added to table names: mdev_players, mdev_stats. Change it to keep servers apart in one database.
+  table-prefix: mdev_
+
+  mysql:
+    host: localhost
+    port: 3306
+    database: minecraft
+    user: root
+    password: ""
+    # Extra connection options, joined with &.
+    options: "useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=utf8"
+
+
+stats:
+  # How often leaderboards shown by placeholders are reloaded from the database. At least 30s.
+  top-refresh: 5m

@@ -1,0 +1,95 @@
+# Rarities of event caches and their keys.
+#
+# A rarity says how its caches look and what opens them. Loot tables in the loot folder only
+# list what drops for each rarity, so one "rare" key opens rare caches of every table.
+# Add as many rarities as you like; the id (the key of the section) is what you type in
+# commands, loot tables and event files: /eventide givekey <player> <id>
+#
+# After changes: /eventide reload
+#
+# Fields:
+#   name     shown in messages and on keys as <rarity>
+#   block    the cache block. Full blocks look best; chests and shulker boxes work but
+#            are invisible while an airdrop crate falls
+#   points   points for opening such a cache (a loot table can override it)
+#   effects  idle — glow over a closed cache, open — when it is opened
+#            (names from plugins/MDevCore/effects; remove a line for no effect)
+#   key      what opens the cache. Without a key section caches open with a click.
+#     item        the key item: material, name, lore, glow, model (custom model / item model),
+#                 enchantments. <rarity> in the name or lore is replaced with the rarity name
+#     price       cost in /eventide buykey (needs Vault and modules.keys.shop). 0 = not sold
+#     consume     false = the key is not used up and opens caches again and again
+#     also-opens  other rarities this key opens too, e.g. a master key: [common, rare]
+#
+# Keys already handed out keep working after you change the key item: only the rarity id
+# stored inside the key matters.
+
+rarities:
+  common:
+    name: "<gray>Обычный"
+    block: barrel
+    points: 1
+    effects:
+      idle: cache-idle-common
+      open: cache-open-common
+    key:
+      item:
+        material: tripwire_hook
+        name: "<gray>Ключ: <rarity>"
+        lore: ["<dark_gray>Открывает обычный тайник ивента"]
+      price: 500
+
+  rare:
+    name: "<#5DADE2>Редкий"
+    block: chest
+    points: 3
+    effects:
+      idle: cache-idle-rare
+      open: cache-open-rare
+    key:
+      item:
+        material: tripwire_hook
+        name: "<#5DADE2>Ключ: <rarity>"
+        lore: ["<dark_gray>Открывает редкий тайник ивента"]
+        glow: true
+      price: 2000
+
+  epic:
+    name: "<#B084F5>Эпический"
+    block: ender_chest
+    points: 10
+    effects:
+      idle: cache-idle-epic
+      open: cache-open-epic
+    key:
+      item:
+        material: trial_key
+        name: "<#B084F5>Ключ: <rarity>"
+        lore:
+          - "<dark_gray>Открывает эпический тайник ивента"
+          - "<dark_gray>и тайники попроще"
+        glow: true
+      also-opens: [common, rare]
+
+  # The airdrop crate: opened by standing next to it, so it has no key.
+  airdrop:
+    name: "<#5DADE2>Груз"
+    block: barrel
+    points: 15
+    effects:
+      open: airdrop-open
+
+  # An example of a reusable master key. Remove the # signs to try it:
+  # /eventide givekey <player> master
+  # master:
+  #   name: "<gold>Мастер"
+  #   block: gilded_blackstone
+  #   points: 25
+  #   key:
+  #     item:
+  #       material: golden_hoe
+  #       name: "<gold>Мастер-ключ"
+  #       lore: ["<gray>Открывает любые тайники и не тратится"]
+  #       glow: true
+  #     consume: false
+  #     also-opens: [common, rare, epic]

@@ -1,0 +1,209 @@
+config-version: 6
+
+# Eventide settings.
+# Events are in the events folder, loot tables in the loot folder, rarities and keys
+# in rarities.yml, and every animation in plugins/MDevCore/effects.
+# After any change: /eventide reload
+
+
+# Language of messages. Files are in the lang folder; copy one to add your own.
+language: ru
+
+# Show each player messages in their client language when that file exists.
+use-client-language: true
+
+
+commands:
+  # Other names for /eventide. Pick ones no other plugin on your server uses.
+  # Changes here need a server restart.
+  aliases: [ev, events, event]
+
+  # Other names for subcommands, e.g. /ev key instead of /eventide givekey.
+  # Any of them can be removed or extended; an empty list [] leaves only the main name.
+  subcommands:
+    help: [h]
+    start: [run]
+    stop: [end]
+    tp: [goto]
+    givekey: [key, give]
+    buykey: [buy]
+    loot: [editor]
+    reload: [rl]
+
+
+schedule:
+  # Time zone for the start times in events/*.yml, for example Europe/Moscow or Europe/Berlin.
+  timezone: Europe/Moscow
+
+  # How many events may run at the same time.
+  max-active: 1
+
+  # What /eventide shows to players:
+  #   dialog  a window with the schedule (Minecraft 1.21.6 or newer)
+  #   chat    the same lines in chat
+  #   off     nothing, only admins can use the command
+  menu: dialog
+
+
+# Every system can be turned off separately. Event files stay the same:
+# the parts that belong to a disabled system are simply skipped.
+modules:
+  # Start events by the times in their files. Off = only /eventide start.
+  scheduler: true
+
+  # Boss bar countdowns from "countdown" stages.
+  countdown-bar: true
+
+  # Mobs guarding the caches, from "spawn-guards" stages.
+  guards: true
+
+  keys:
+    # Caches need a key of their tier. Off = any player opens any cache with a click,
+    # and none of the key sources below give keys.
+    enabled: true
+
+    # Guards drop keys (key-drops in spawn-guards).
+    from-guards: true
+
+    # The "key: <tier> [amount]" reward works, in events and in other plugins built on MDevCore.
+    as-reward: true
+
+    # Players buy keys with /eventide buykey <tier>. Needs Vault and an economy plugin;
+    # prices are set per tier in the loot tables.
+    shop: false
+
+  # Points and the top-3 message at the end of an event.
+  leaderboard: true
+
+  # Rewards from "rewards" in event files. Off = events give only the loot.
+  rewards: true
+
+  # Animations of caches, guards, crates and bosses. Effects placed in event stages are part
+  # of the scenario and are turned off with effects.enabled in MDevCore/config.yml.
+  effects: true
+
+  # A glow over closed caches so players can find them from a distance.
+  cache-glow: true
+
+  # Guards, wave mobs and bosses glow through walls, in the colour set by "glow" in event files.
+  # Players whose scoreboard is replaced by another plugin (TAB and the like) see a white outline.
+  mob-glow: true
+
+  # "marker" stages: an effect over the event spot until the end, and the distance and direction
+  # to it in the action bar of players nearby.
+  marker: true
+
+  # Wins, points, opened caches and killed bosses of every player, kept by MDevCore
+  # (SQLite or MySQL, see MDevCore/config.yml).
+  stats: true
+
+  # %eventide_...% placeholders for PlaceholderAPI. Changing this needs a server restart.
+  placeholders: true
+
+  # Check the ground before an event starts, see spot-check below. Off = any dry block will do,
+  # including a tree top, a roof or the edge of a cliff.
+  spot-check: true
+
+  # Builds from "structure" in event files, e.g. the siege fortress. The ground under a build is
+  # saved before it goes up and put back when the event ends, even after a crash.
+  # Off = events run on the bare ground.
+  structures: true
+
+  # Limits around a running event, see event-region below. Off = only the build itself is protected.
+  event-region: true
+
+  # Events never start on claimed land, see claims below. Off = claims are not checked.
+  claims: true
+
+
+# Where an event may start. Before the start a square around the spot is checked; if it does not fit,
+# another spot is tried (location.attempts in the event file). Any key can be changed per event
+# in location.surface, e.g. a larger radius for a big arena.
+spot-check:
+  # Half the side of the checked square, in blocks. Events with a build always check the whole build.
+  radius: 8
+
+  # Highest ground minus lowest ground in the square. More than this is a slope or a cliff.
+  max-height-difference: 4
+
+  # Share of the square that must be natural ground from the list below: not trees, rock walls
+  # or player builds. Any water or lava in the square rules the spot out.
+  min-ground: 90%
+
+  # Natural ground. Block names or block tags with #, e.g. "#minecraft:sand". Tags change between
+  # Minecraft versions, so the list below names the blocks.
+  ground:
+    - grass_block
+    - dirt
+    - coarse_dirt
+    - rooted_dirt
+    - podzol
+    - mycelium
+    - moss_block
+    - pale_moss_block
+    - sand
+    - red_sand
+    - stone
+    - granite
+    - diorite
+    - andesite
+    - tuff
+    - deepslate
+    - "#minecraft:terracotta"
+    - gravel
+    - snow_block
+    - clay
+    - sandstone
+    - red_sandstone
+    - calcite
+    - mud
+
+
+# The area around a running event where players and the world are limited, so the event cannot be
+# walled off, flooded or griefed. It exists only while the event runs. Any key can be changed per
+# event in "region" in the event file. Players with eventide.region.bypass are not limited.
+event-region:
+  # Half the side of the square, in blocks. 0 = the checked area of the event plus 16 blocks,
+  # enough to cover caches, guards and the boss leash.
+  radius: 0
+
+  # How far the region reaches below and above the event spot.
+  below: 16
+  above: 64
+
+  # What is not allowed inside:
+  #   break, place     breaking and placing blocks, item frames and paintings
+  #   buckets          pouring and scooping water and lava
+  #   containers       opening chests, barrels, furnaces and the like (event caches still open)
+  #   use              doors, trapdoors, gates, buttons, levers, redstone parts, beds, bells, pressure plates
+  #   explosions       blocks destroyed by TNT, creepers, beds and other explosions
+  #   fire             fire starting, spreading and burning blocks
+  #   pistons          pistons moving blocks into or inside the region
+  #   fluids           water and lava flowing
+  #   mob-griefing     endermen, ravagers, withers and other mobs changing blocks
+  #   mob-spawning     natural mobs, patrols and spawners; event mobs are not affected
+  #   pvp              players hurting each other
+  #   ender-pearls     ender pearls and chorus fruit taking players into the region
+  # An event build forbids break, place, buckets, containers, explosions, fire, pistons, fluids
+  # and mob-griefing inside itself anyway: it is rolled back at the end.
+  deny: [break, place, buckets, explosions, fire, pistons, fluids, mob-griefing, mob-spawning]
+
+  # Commands players cannot use inside, without the slash. Add the names other plugins use
+  # for the same thing, e.g. createhome or addhome.
+  blocked-commands: [sethome, createhome, setwarp]
+
+
+# Events never start on claimed land, and their region never reaches it: otherwise the region would
+# stop owners from building on their own land. Checked with every installed plugin of these:
+# WorldGuard, GriefPrevention, Lands, Towny.
+claims:
+  # Free blocks kept between the event region and the nearest claim.
+  margin: 8
+
+  # WorldGuard regions events may overlap anyway, e.g. one that covers the whole map.
+  worldguard-ignore: []
+
+
+visuals:
+  # How often the glow over closed caches replays. Lower is prettier, higher is lighter.
+  cache-glow-every: 3s

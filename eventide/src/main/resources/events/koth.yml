@@ -1,0 +1,80 @@
+# King of the hill: hold the zone around the spot. Every second alone in the zone gives points.
+# /eventide start koth
+
+name: "<#B084F5>Царь горы</#B084F5>"
+
+schedule: ["19:00"]
+min-online: 3
+
+location:
+  world: world
+  center: [0, 0]
+  # true = only spots under open sky, not under tree crowns, so the crate and the zone are easy to see.
+  open-sky: true
+  radius: [200, 1000]
+
+loot-table: default
+
+# Ends early when someone reaches win-score.
+finish-on: [zone-won]
+
+rewards:
+  places:
+    1: ["xp: 800", "key: epic"]
+    2: ["xp: 400", "key: rare"]
+    3: ["xp: 200", "key: common"]
+  participation: ["xp: 50"]
+
+effects:
+  finish: event-victory
+
+stages:
+  - actions:
+      # A beam over the spot and the distance to it in the action bar, until the event ends.
+      - type: marker
+        effect: event-marker
+        every: 2s
+        # Players within "radius" blocks see the distance; it is hidden once they are closer than "hide-within".
+        compass: {radius: 160, hide-within: 8}
+      - type: broadcast
+        message: "<accent>Ивенты</accent> <dark_gray>»</dark_gray> <gray>Через <white>5 минут</white> на <white><x> <z></white> начнётся <event><gray>. Держите зону дольше всех."
+      - type: effect
+        effect: event-announce
+      - type: countdown
+        duration: 5m
+        title: "<event> <gray>через <white><time>"
+        color: purple
+
+  - after: 5m
+    actions:
+      - type: title
+        title: "<event>"
+        subtitle: "<gray>зона открыта на <white><x> <z>"
+        radius: 200
+      - type: capture-zone
+        # Size of the zone: radius around the spot and how far above or below it still counts.
+        radius: 6
+        height: 4
+        points-per-second: 1
+        # First to this many points wins at once. 0 = play until the timer below runs out.
+        win-score: 180
+        # When several players stand in the zone:
+        #   nobody    no one gets points until one is left
+        #   everyone  all of them get points
+        contested: nobody
+        # The player holding the zone alone glows through walls.
+        holder-glow: true
+        bar: {color: purple, radius: 96}
+        effects:
+          # Drawn along the edge of the zone.
+          border: zone-border
+          border-every: 2s
+      - type: countdown
+        duration: 10m
+        title: "<event> <gray>— осталось <white><time>"
+        color: white
+
+  - after: 10m
+    actions:
+      - type: broadcast
+        message: "<accent>Ивенты</accent> <dark_gray>»</dark_gray> <gray>Время <event> <gray>вышло."

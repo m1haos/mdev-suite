@@ -1,0 +1,13 @@
+name: MDevCore
+version: '${version}'
+main: com.mdevstudio.core.MDevCorePlugin
+api-version: '${apiVersion}'
+description: Shared core for M/Dev Studio plugins
+authors: [M/Dev Studio]
+website: ''
+softdepend: [Vault]
+
+permissions:
+  mdevcore.admin:
+    description: Access to /mdevcore
+    default: op

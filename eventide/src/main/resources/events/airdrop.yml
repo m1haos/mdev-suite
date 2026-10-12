@@ -1,0 +1,80 @@
+# Airdrop: a crate falls from the sky. It opens for the player who stays next to it alone
+# long enough, so the whole event is a fight for one spot. /eventide start airdrop
+
+name: "<#5DADE2>Сброс груза</#5DADE2>"
+
+schedule: ["16:00", "20:00"]
+min-online: 2
+
+location:
+  world: world
+  center: [0, 0]
+  # true = only spots under open sky, not under tree crowns, so the crate and the zone are easy to see.
+  open-sky: true
+  radius: [300, 1500]
+
+# The crate is the "airdrop" tier of this loot table: block, loot and points.
+loot-table: default
+
+# The event ends as soon as the crate is opened.
+finish-on: [airdrop-captured]
+
+rewards:
+  places:
+    1: ["xp: 300"]
+  participation: ["xp: 50"]
+
+effects:
+  finish: event-victory
+
+stages:
+  - actions:
+      # A beam over the spot and the distance to it in the action bar, until the event ends.
+      - type: marker
+        effect: event-marker
+        every: 2s
+        # Players within "radius" blocks see the distance; it is hidden once they are closer than "hide-within".
+        compass: {radius: 160, hide-within: 8}
+      - type: broadcast
+        message: "<accent>Ивенты</accent> <dark_gray>»</dark_gray> <gray>Через <white>3 минуты</white> на <white><x> <z></white> сбросят <event><gray>."
+      - type: effect
+        effect: event-announce
+      - type: countdown
+        duration: 3m
+        title: "<event> <gray>через <white><time>"
+        color: blue
+
+  - after: 3m
+    actions:
+      - type: airdrop
+        tier: airdrop
+        # Blocks above the ground where the fall starts, and how long it takes.
+        height: 60
+        fall-time: 6s
+        capture:
+          # How close to the crate a player has to be, in blocks.
+          radius: 4
+          # How long to stay next to it alone.
+          time: 30s
+          # What happens when several players are near the crate:
+          #   pause  progress stops until one player is left
+          #   reset  progress starts over
+          contested: pause
+        # Who sees the progress bar: players within this many blocks. 0 = the whole server.
+        bar: {color: blue, radius: 64}
+        effects:
+          trail: airdrop-trail
+          land: airdrop-land
+
+  # The fall takes 6 seconds; the time limit starts when the crate lands.
+  - after: 6s
+    actions:
+      - type: countdown
+        duration: 10m
+        title: "<event> <gray>— <white><x> <z></white>, осталось <white><time>"
+        color: yellow
+
+  - after: 10m
+    actions:
+      - type: broadcast
+        message: "<accent>Ивенты</accent> <dark_gray>»</dark_gray> <gray>Никто не успел вскрыть <event><gray>. Груз забрали обратно."

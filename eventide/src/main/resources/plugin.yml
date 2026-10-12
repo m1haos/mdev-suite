@@ -1,0 +1,25 @@
+name: Eventide
+version: '${version}'
+main: com.mdevstudio.eventide.EventidePlugin
+api-version: '${apiVersion}'
+description: Multi-stage server events built from stages
+authors: [M/Dev Studio]
+website: ''
+depend: [MDevCore]
+softdepend: [PlaceholderAPI, Vault, WorldGuard, GriefPrevention, Lands, Towny]
+
+permissions:
+  eventide.admin:
+    description: Start, stop and reload events, give keys
+    default: op
+    children:
+      eventide.command.tp: true
+  eventide.command.tp:
+    description: Teleport to a running event with /eventide tp
+    default: op
+  eventide.region.bypass:
+    description: Build, break and use commands inside event regions and builds
+    default: false
+  eventide.command.buykey:
+    description: Buy event keys with /eventide buykey
+    default: true

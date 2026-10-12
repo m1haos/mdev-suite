@@ -1,0 +1,136 @@
+prefix: "<accent>Ивенты</accent> <dark_gray>»</dark_gray> "
+
+event:
+  finished: "<prefix><gray>Ивент <event> <gray>завершён. Лучшие участники:"
+  finished-empty: "<prefix><gray>Ивент <event> <gray>завершён. В этот раз никто не успел."
+  finished-plain: "<prefix><gray>Ивент <event> <gray>завершён. Спасибо всем, кто участвовал."
+  top-line: "<gray>  <white><place>.</white> <player> <dark_gray>—</dark_gray> <accent><points></accent> очк."
+  stopped: "<prefix><event> <gray>остановлен. Награды за этот раз не выдаются."
+
+container:
+  need-key: "<prefix><warning>Этот тайник открывается ключом:</warning> <tier><warning>."
+  wrong-key: "<prefix><warning>Этот ключ не подходит. Нужен ключ:</warning> <tier>"
+  opened: "<prefix><success>Тайник открыт:</success> <tier> <gray>(+<points> очк.)"
+  protected: "<prefix><error>Это тайник ивента, его нельзя сломать."
+
+region:
+  denied: "<prefix><error>Здесь идёт ивент <event><error>, это нельзя делать до его конца."
+  command-blocked: "<prefix><error>Эта команда не работает на месте ивента <event><error>."
+
+build:
+  protected: "<prefix><error>Постройку ивента нельзя менять, пока он идёт. После ивента местность вернётся как была."
+
+airdrop:
+  incoming: "<prefix><gray>Сюда падает груз. Отойдите, пока не придавило."
+  landed: "<prefix><event><gray>: груз приземлился на <white><x> <z></white>. Встаньте рядом с ящиком, чтобы вскрыть его."
+  hint: "<prefix><gray>Стойте рядом с ящиком <white><seconds> с</white> один, чтобы вскрыть его."
+  captured: "<prefix><white><player></white> <gray>вскрыл груз!"
+  bar-waiting: "<event> <gray>— встаньте рядом с ящиком"
+  bar-capturing: "<event> <gray>— вскрывает <white><player></white> <accent><percent>%"
+  bar-contested: "<event> <warning>— у ящика несколько игроков, вскрытие остановлено"
+
+zone:
+  bar-empty: "<event> <gray>— зона свободна. Лидер: <white><leader></white> <accent><points>/<goal>"
+  bar-held: "<event> <gray>— зону держит <white><holder></white>. Лидер: <white><leader></white> <accent><points>/<goal>"
+  bar-contested: "<event> <warning>— зона оспаривается.</warning> <gray>Лидер: <white><leader></white> <accent><points>/<goal>"
+  won: "<prefix><white><player></white> <gray>удержал зону до победы!"
+
+marker:
+  compass: "<event> <dark_gray>»</dark_gray> <white><distance> м</white> <accent><arrow>"
+
+waves:
+  started: "<prefix><event> <gray>— волна <white><wave>/<waves></white>!"
+  next: "<prefix><gray>Волна отбита. Следующая через <white><seconds> с</white>."
+  cleared: "<prefix><success>Все волны отбиты!"
+  bar: "<event> <gray>— волна <white><wave>/<waves></white>, осталось врагов: <white><left>"
+
+boss:
+  spawned: "<prefix><boss> <gray>появился на <white><x> <z></white>!"
+  phase: "<prefix><boss> <warning>впадает в ярость</warning> <gray>(фаза <phase>)"
+  killed: "<prefix><boss> <gray>повержен! Последний удар: <white><player>"
+  bar: "<boss> <gray>— фаза <white><phase>"
+
+shop:
+  disabled: "<prefix><gray>Покупка ключей на этом сервере выключена."
+  not-for-sale: "<prefix><warning>Ключ <rarity> не продаётся."
+  no-economy: "<prefix><error>На сервере нет экономики (Vault), ключи купить нельзя."
+  not-enough: "<prefix><warning>Не хватает денег:</warning> ключ <rarity> <gray>стоит <white><price>"
+  bought: "<prefix><success>Куплен ключ:</success> <rarity> ×<amount> <gray>за <white><price>"
+
+schedule:
+  title: "<accent>Ивенты сервера"
+  running: "<event> <success>идёт сейчас</success> <gray>— <white><x> <z></white> <dark_gray>(<world>)</dark_gray>"
+  next: "<event> <gray>— следующий в <white><time>"
+  manual: "<event> <gray>— только по команде администратора"
+  empty: "<gray>Ивентов пока нет."
+  disabled: "<prefix><gray>Расписание ивентов на этом сервере скрыто."
+
+command:
+  starting: "<prefix><gray>Ищу место для <event><gray>..."
+  start-failed: "<prefix><error>Не удалось запустить <id>:</error> <gray><reason>"
+  already-running: "<prefix><warning><id> уже идёт."
+  too-many: "<prefix><warning>Одновременно может идти не больше <max> ивентов (max-active в config.yml)."
+  unknown-loot: "<prefix><error>У ивента <id> указана лут-таблица <loot>, её нет в папке loot."
+  unknown-event: "<prefix><error>Ивента <id> нет. Файлы ивентов лежат в папке events."
+  stopped: "<prefix><gray>Ивент <white><id></white> остановлен."
+  not-running: "<prefix><warning><id> сейчас не идёт."
+  tp-none: "<prefix><gray>Сейчас не идёт ни один ивент."
+  tp-list: "<prefix><gray>Идут ивенты, нажмите на нужный:"
+  tp-line: "<gray>  <event> <dark_gray>—</dark_gray> <white><x> <z></white> <dark_gray>(<world>)"
+  tp-hover: "<gray>Телепортироваться"
+  teleported: "<prefix><gray>Вы на месте ивента <event><gray>."
+  unknown-rarity: "<prefix><error>Редкости <rarity> нет в rarities.yml."
+  keyless-rarity: "<prefix><warning>У редкости <rarity> нет ключа: её тайники открываются без него."
+  key-given: "<prefix><gray>Выдан ключ <white><player></white>: <rarity> ×<amount>"
+  reloaded: "<prefix><success>Перезагружено.</success> <gray>Ивентов: <white><events></white>, редкостей: <white><rarities>"
+
+editor:
+  tables-title: "<accent>Лут-таблицы"
+  table-button: "<white><table></white> <gray>(уровней: <tiers>)"
+  empty: "<gray>Лут-таблиц нет. Положите файл в папку loot и сделайте /eventide reload."
+  tiers-title: "<accent>Лут:</accent> <white><table>"
+  tier-button: "<tier> <gray>— предметов: <count>"
+  tier-title: "<tier>"
+  tier-info: "<gray>Редкость <rarity><gray>. Бросков при открытии: <white><rolls></white>, очки: <white><points></white>, цена ключа: <white><price></white>. Шанс считается за один бросок."
+  entry-line: "<gray><index>.</gray> <white><name></white> <dark_gray>·</dark_gray> <gray>вес <white><weight></white>, шанс <accent><chance>%</accent>, <white><amount></white> шт."
+  entry-button: "<gray><index>.</gray> <name>"
+  rewards-only: "Только награды"
+  add-hand: "<success>+ Предмет из руки"
+  tier-settings: "Настройки уровня"
+  entry-title: "<accent>Предмет <index></accent> <gray>— <tier>"
+  entry-info: "<gray>Шанс за один бросок: <accent><chance>%</accent>. Бросков при открытии: <white><rolls></white>. Шанс считается от суммы весов всех предметов уровня."
+  weight-label: "Вес"
+  amount-min-label: "Количество от"
+  amount-max-label: "Количество до"
+  rolls-min-label: "Бросков от"
+  rolls-max-label: "Бросков до"
+  points-label: "Очки за открытие"
+  settings-title: "<accent>Настройки</accent> <tier>"
+  save: "<success>Сохранить"
+  remove: "<error>Удалить"
+  remove-title: "<error>Удалить предмет <index>?"
+  remove-question: "<white><name></white> <gray>пропадёт из лута уровня <tier><gray>. Вернуть можно только добавив заново."
+  remove-yes: "<error>Удалить"
+  remove-no: "Отмена"
+  back: "Назад"
+  close: "Закрыть"
+  saved: "<prefix><success>Сохранено в loot/<file>.</success> <gray>Идущие ивенты доиграют со старым лутом."
+  added: "<prefix><success>Добавлено:</success> <name><gray>. Поставьте вес и количество."
+  removed: "<prefix><gray>Предмет удалён из лута."
+  empty-hand: "<prefix><warning>Возьмите предмет в основную руку."
+  last-entry: "<prefix><warning>Это последний предмет уровня: без лута таблица не загрузится. Сначала добавьте другой."
+  save-failed: "<prefix><error>Не удалось сохранить:</error> <gray><reason>"
+  gone: "<prefix><warning>Этой таблицы или уровня больше нет. Откройте /eventide loot заново."
+  unsupported: "<prefix><error>Редактору нужны диалоговые окна: сервер и клиент 1.21.6 или новее."
+  settings-info: "<gray>Броски и очки меняются только для этой таблицы. Блок тайника, ключ и его цена — у редкости в rarities.yml."
+
+help:
+  header: "<accent>Eventide</accent> <dark_gray>—</dark_gray> <gray>команды"
+  menu: "<white>/eventide</white> <gray>— расписание ивентов. Другие имена: <white><aliases>"
+  start: "<white>/eventide start <ивент></white> <gray>— запустить сейчас. Ещё: <white><aliases>"
+  stop: "<white>/eventide stop <ивент></white> <gray>— остановить без наград. Ещё: <white><aliases>"
+  tp: "<white>/eventide tp [ивент]</white> <gray>— телепорт к идущему ивенту, без имени — список. Ещё: <white><aliases>"
+  givekey: "<white>/eventide givekey <игрок> <редкость> [кол-во]</white> <gray>— выдать ключ. Ещё: <white><aliases>"
+  buykey: "<white>/eventide buykey <редкость> [кол-во]</white> <gray>— купить ключ. Ещё: <white><aliases>"
+  loot: "<white>/eventide loot</white> <gray>— редактор лута. Ещё: <white><aliases>"
+  reload: "<white>/eventide reload</white> <gray>— перечитать настройки. Ещё: <white><aliases>"

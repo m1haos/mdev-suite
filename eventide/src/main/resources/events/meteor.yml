@@ -1,0 +1,115 @@
+# The file name (meteor) is the event id: /eventide start meteor
+
+# Shown in messages as <event>.
+name: "<#FF8A3D>Падение метеорита</#FF8A3D>"
+
+# Start times in the time zone from config.yml. Leave the list empty to start only by command.
+schedule: ["14:00", "18:00", "21:00"]
+
+# A scheduled start is skipped when fewer players are online. /eventide start ignores this.
+min-online: 2
+
+location:
+  world: world
+  # Center of the search area, x and z.
+  center: [0, 0]
+  # How far from the center the event may land, in blocks: [min, max].
+  radius: [300, 1500]
+
+# File in the loot folder, without .yml.
+loot-table: default
+
+# Signals that end the event at once, with results and rewards. Here: every cache is opened.
+# Without it the event runs until its last stage.
+finish-on: [caches-opened]
+
+rewards:
+  # By final points. Any reward type from MDevCore: command, player-command, message,
+  # broadcast, xp, item, sound, effect, money (Vault), key (e.g. "key: rare 2").
+  # <player> is replaced with the player's name.
+  places:
+    1: ["xp: 500", "message: <success>Первое место в ивенте!"]
+    2: ["xp: 300"]
+    3: ["xp: 150"]
+  # Everyone who got at least one point.
+  participation: ["xp: 50"]
+
+effects:
+  # Plays at the event spot when the event ends and someone took part.
+  finish: event-victory
+
+# Stages run top to bottom. "after" is the wait since the previous stage started.
+# When the last stage ends, or a signal from finish-on arrives, the event finishes and rewards are handed out.
+#
+# Stage actions:
+#   broadcast, title, actionbar, sound, command, effect          (from MDevCore)
+#   countdown, spawn-loot, spawn-guards, airdrop, capture-zone,
+#   waves, boss                                                  (from Eventide)
+#
+# A stage can also wait for a signal instead of a timer:
+#   - wait-for: boss-killed   # caches-opened, guards-killed, airdrop-captured, zone-won,
+#     timeout: 15m            # wave-cleared, waves-cleared, boss-killed, boss-lost
+#                             # the timeout is required: the event ends when it runs out
+#     actions: [...]
+stages:
+  - actions:
+      # A beam over the spot and the distance to it in the action bar, until the event ends.
+      - type: marker
+        effect: event-marker
+        every: 2s
+        # Players within "radius" blocks see the distance; it is hidden once they are closer than "hide-within".
+        compass: {radius: 160, hide-within: 8}
+      - type: broadcast
+        message: "<accent>Ивенты</accent> <dark_gray>»</dark_gray> <gray>Через <white>5 минут</white> на <white><x> <z></white> упадёт <event><gray>. Стражи охраняют тайники, ключи выпадают с них."
+      - type: effect
+        effect: event-announce
+      - type: countdown
+        duration: 5m
+        title: "<event> <gray>упадёт через <white><time>"
+        color: red
+
+  - after: 5m
+    actions:
+      - type: effect
+        effect: meteor-strike
+
+  # The strike effect takes 2 seconds to reach the ground; caches appear on impact.
+  - after: 2s
+    actions:
+      - type: title
+        title: "<event>"
+        subtitle: "<gray>упал на <white><x> <z>"
+        radius: 200
+      - type: spawn-loot
+        # How many caches of each tier from the loot table.
+        containers: {common: 6, rare: 3, epic: 1}
+        # Caches land within this many blocks of the center. Keep it under 24.
+        spread: 12
+      - type: spawn-guards
+        entity: zombie
+        # Guards glow through walls: a colour (gold, red, aqua, ...), true or false.
+        glow: gold
+        # One guard per cache, so every cache can be opened in one event.
+        count: 10
+        spread: 10
+        name: "<#FF8A3D>Страж метеорита"
+        health: 40
+        # Points for killing a guard. Opening a cache gives the points of its loot tier.
+        points: 2
+        # Each guard drops one key. Weights, not percent.
+        key-drops: {common: 60, rare: 30, epic: 10}
+        effects:
+          spawn: guard-spawn
+          death: guard-death
+          key-drop: key-drop
+      - type: countdown
+        duration: 10m
+        title: "<event> <gray>— <white><x> <z></white>, осталось <white><time>"
+        color: yellow
+      - type: broadcast
+        message: "<accent>Ивенты</accent> <dark_gray>»</dark_gray> <event> <gray>упал на <white><x> <z></white>. У вас 10 минут."
+
+  - after: 10m
+    actions:
+      - type: broadcast
+        message: "<accent>Ивенты</accent> <dark_gray>»</dark_gray> <gray>Осколки <event> <gray>остыли."
