@@ -5,7 +5,7 @@
 | Модуль | Плагин | Что это |
 |---|---|---|
 | `core` | MDevCore | Общее ядро: палитра и MiniMessage, конфиги с версиями, языки, предметы из конфига, награды, сценарии с сигналами, библиотека эффектов, статистика игроков (SQLite/MySQL), Vault. |
-| `eventide` | Eventide | Ивенты из этапов: метеорит, сброс груза, царь горы, осада с боссом. Тайники с ключами, стражи, очки, награды, расписание, PlaceholderAPI. |
+| `eventide` | Eventide | Ивенты из этапов: метеорит, сброс груза, царь горы, осада с боссом. Тайники с ключами, стражи, очки, награды, расписание, случайные ивенты по редкостям, PlaceholderAPI. |
 
 ## Версии
 
@@ -63,23 +63,26 @@ gradlew :eventide:runServerLegacy → то же на 1.21.8 (папка run/1.21
 
 `/eventide loot` → таблица → уровень. В окне уровня видны все предметы с весом, шансом за бросок и количеством.
 
-- **+ Предмет из руки** — предмет сохраняется в таблицу целиком: чары, имя, модель, данные других плагинов. В файле это строка `item-data`.
+- «+ Предмет из руки»: предмет сохраняется в таблицу целиком: чары, имя, модель, данные других плагинов. В файле это строка `item-data`.
 - Кнопка предмета — ползунки веса и количества, удаление с подтверждением.
-- **Настройки уровня** — число бросков и очки за открытие в этой таблице. Ключ и его цена меняются в `rarities.yml`.
+- «Настройки уровня»: число бросков и очки за открытие в этой таблице. Ключ и его цена меняются в `rarities.yml`.
 
 Изменения сразу пишутся в `loot/<таблица>.yml` и перечитываются. Идущие ивенты доигрывают со старым лутом. Нужны сервер и клиент 1.21.6+ (диалоговые окна).
 
 ## Модули
 
-`plugins/Eventide/config.yml`, секция `modules`: `scheduler`, `countdown-bar`, `guards`, `keys` (`enabled`, `from-guards`, `as-reward`, `shop`), `leaderboard`, `rewards`, `effects`, `cache-glow`, `mob-glow`, `marker`, `stats`, `placeholders`. Любой можно выключить, файлы ивентов менять не нужно.
+`plugins/Eventide/config.yml`, секция `modules`: `scheduler`, `countdown-bar`, `guards`, `keys` (`enabled`, `from-guards`, `as-reward`, `shop`, `captain`), `leaderboard`, `rewards`, `effects`, `cache-glow`, `mob-glow`, `marker`, `stats`, `placeholders`. Любой можно выключить, файлы ивентов менять не нужно.
 
 ## Действия этапов
 
+- `captain`: NPC-капитан даёт ключ редкости `rarity` за задание. `task: {type: kill, count: 5, entities: [zombie]}` (убить мобов рядом с ивентом, без `entities` любых монстров), `{type: bring, item: iron_ingot, count: 16}` (принести предметы) или без `task` (ключ за разговор). `per-player` — сколько ключей даст одному игроку, `dialog` — реплики при первом разговоре, `entity` и `name` как у стражей. Выключается `modules.keys.captain`.
 - Ядро: `broadcast`, `title`, `actionbar`, `sound`, `command`, `effect`.
-- Eventide: `countdown`, `marker`, `spawn-loot`, `spawn-guards`, `airdrop`, `capture-zone`, `waves`, `boss`.
+- Eventide: `countdown`, `marker`, `spawn-loot`, `spawn-guards`, `airdrop`, `capture-zone`, `waves`, `boss`, `captain`, `collect`.
+- `collect`: блоки вокруг места (тыквы, подарки), игрок берёт их кликом или ударом и получает очки; новые появляются по таймеру, часть может быть «проклятой» (больше очков, из блока вылезают мобы). `goal` даёт сигнал `collect-won`.
+- `capture-zone` принимает `offset: [x, y, z]`: зона не на месте ивента, а со сдвигом, например на вершине постройки.
 - `marker` держит место видимым до конца ивента: эффект `event-marker` раз в 2 с и `<расстояние> м ↗` в строке действий у игроков в радиусе 160 блоков (`compass: {radius, hide-within}`).
 - Стражи, волны и босс светятся сквозь стены: `glow: red` (любой цвет Minecraft), `true` или `false`. В `waves` есть `glow-when-left: 3` — подсветить только трёх последних мобов волны.
-- Этап может ждать сигнала вместо таймера: `wait-for: boss-killed`, `timeout: 15m`. Сигналы: `caches-opened`, `guards-killed`, `airdrop-captured`, `zone-won`, `wave-cleared`, `waves-cleared`, `boss-killed`.
+- Этап может ждать сигнала вместо таймера: `wait-for: boss-killed`, `timeout: 15m`. Сигналы: `caches-opened`, `guards-killed`, `airdrop-captured`, `zone-won`, `collect-won`, `wave-cleared`, `waves-cleared`, `boss-killed`.
 - `finish-on: [сигнал]` в файле ивента — завершить ивент сразу, когда пришёл сигнал.
 
 ## Награды
@@ -93,6 +96,7 @@ MDevCore хранит счётчики игроков: `plugins/MDevCore/data.db
 | Плейсхолдер | Что показывает |
 |---|---|
 | `%eventide_next%`, `%eventide_next_time%`, `%eventide_next_in%` | Ближайший ивент по расписанию, время старта, сколько осталось |
+| `%eventide_next_random%` | Сколько осталось до броска случайного ивента; пусто, если они выключены или на паузе |
 | `%eventide_active%`, `%eventide_active_x%` / `_y` / `_z` / `_world` | Идущий ивент и где он |
 | `%eventide_points%`, `%eventide_leader%`, `%eventide_leader_points%` | Очки игрока и лидер в идущем ивенте |
 | `%eventide_wins%`, `%eventide_played%`, `%eventide_total_points%`, `%eventide_caches%`, `%eventide_airdrops%`, `%eventide_bosses%` | Статистика игрока за всё время |
@@ -115,4 +119,4 @@ MDevCore хранит счётчики игроков: `plugins/MDevCore/data.db
 
 - При падении сервера во время ивента занятые блоки остаются в мире. Нужна запись идущего ивента на диск и уборка при старте.
 - Редактор меняет список `loot:` уровня целиком, поэтому комментарии внутри этого списка после правки пропадают. Комментарии в остальном файле остаются.
-- NPC-капитан, WorldGuard, MythicMobs и предметы ItemsAdder/Nexo — следующие этапы.
+- MythicMobs, предметы ItemsAdder/Nexo и NPC из Citizens/FancyNpcs — следующие этапы.
