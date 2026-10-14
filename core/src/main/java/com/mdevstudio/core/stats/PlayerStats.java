@@ -123,8 +123,8 @@ public final class PlayerStats {
                     "SELECT value FROM " + stats + " WHERE uuid = ? AND stat = ?")) {
                 statement.setString(1, player.toString());
                 statement.setString(2, stat);
-                try (ResultSet result = statement.executeQuery()) {
-                    return result.next() ? result.getLong(1) : 0L;
+                try (ResultSet rows = statement.executeQuery()) {
+                    return rows.next() ? rows.getLong(1) : 0L;
                 }
             }
         });
@@ -138,10 +138,10 @@ public final class PlayerStats {
                 statement.setString(1, stat);
                 statement.setInt(2, limit);
                 List<StatEntry> entries = new ArrayList<>();
-                try (ResultSet result = statement.executeQuery()) {
-                    while (result.next()) {
-                        entries.add(new StatEntry(UUID.fromString(result.getString(1)),
-                                Objects.requireNonNullElse(result.getString(2), "?"), result.getLong(3)));
+                try (ResultSet rows = statement.executeQuery()) {
+                    while (rows.next()) {
+                        entries.add(new StatEntry(UUID.fromString(rows.getString(1)),
+                                Objects.requireNonNullElse(rows.getString(2), "?"), rows.getLong(3)));
                     }
                 }
                 return entries;
@@ -192,9 +192,9 @@ public final class PlayerStats {
             try (PreparedStatement statement = connection.prepareStatement(
                     "SELECT stat, value FROM " + stats + " WHERE uuid = ?")) {
                 statement.setString(1, id.toString());
-                try (ResultSet result = statement.executeQuery()) {
-                    while (result.next()) {
-                        values.put(result.getString(1), result.getLong(2));
+                try (ResultSet rows = statement.executeQuery()) {
+                    while (rows.next()) {
+                        values.put(rows.getString(1), rows.getLong(2));
                     }
                 }
             }

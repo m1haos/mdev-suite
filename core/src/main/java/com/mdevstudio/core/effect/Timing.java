@@ -17,7 +17,7 @@ public record Timing(int delay, int duration, int interval) {
         return delay + duration;
     }
 
-    /** The element's own tick for {@code effectTick}, or -1 when it should not draw on that tick. */
+    // -1 when the element should not draw on this tick of the whole effect.
     int localTick(int effectTick) {
         int local = effectTick - delay;
         if (local < 0 || local >= duration || local % interval != 0) {

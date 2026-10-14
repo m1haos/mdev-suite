@@ -5,7 +5,7 @@ api-version: '${apiVersion}'
 description: Shared core for M/Dev Studio plugins
 authors: [M/Dev Studio]
 website: ''
-softdepend: [Vault]
+softdepend: [Vault, ItemsAdder, Nexo, CraftEngine]
 
 permissions:
   mdevcore.admin:

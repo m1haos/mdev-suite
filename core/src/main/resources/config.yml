@@ -1,7 +1,16 @@
-config-version: 4
+config-version: 5
 
 # Other names for /mdevcore. Changes need a server restart.
 command-aliases: [mdc, mcore]
+
+# Items of other plugins in item fields of studio plugin files (loot, equipment, rewards):
+#   itemsadder:namespace:id    nexo:id    craftengine:namespace:id
+# Each works only when its plugin is installed. false switches one off even if the plugin is there.
+# Changes need a server restart.
+custom-items:
+  itemsadder: true
+  nexo: true
+  craftengine: true
 
 # Colors shared by every M/Dev Studio plugin. Use them in any message as
 # <accent>, <success>, <warning> and <error>. Hex values only.

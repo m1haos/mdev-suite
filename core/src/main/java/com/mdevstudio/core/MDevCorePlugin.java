@@ -12,6 +12,7 @@ import com.mdevstudio.core.economy.Money;
 import com.mdevstudio.core.effect.EffectLibrary;
 import com.mdevstudio.core.effect.HarmlessFireworks;
 import com.mdevstudio.core.hook.VaultMoney;
+import com.mdevstudio.core.item.CustomItems;
 import com.mdevstudio.core.reward.BuiltinRewards;
 import com.mdevstudio.core.reward.RewardRegistry;
 import com.mdevstudio.core.scenario.ActionRegistry;
@@ -110,6 +111,7 @@ public final class MDevCorePlugin extends JavaPlugin {
     private YamlConfiguration loadFiles() {
         YamlConfiguration config = YamlFile.load(this, "config.yml");
         text = Text.fromConfig(config.getConfigurationSection("palette"));
+        CustomItems.configure(config.getConfigurationSection("custom-items"));
         effects = EffectLibrary.load(this, config.getConfigurationSection("effects"));
         return config;
     }
