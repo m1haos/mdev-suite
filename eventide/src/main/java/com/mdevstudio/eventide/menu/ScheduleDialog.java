@@ -67,11 +67,16 @@ public final class ScheduleDialog {
             lines.add(plugin.scheduler().nextStart(definition)
                     .map(next -> messages.get(sender, "schedule.next", name,
                             Placeholder.unparsed("time", TIME.format(next))))
-                    .orElseGet(() -> messages.get(sender, "schedule.manual", name)));
+                    .orElseGet(() -> messages.get(sender, randomOnly(plugin, definition)
+                            ? "schedule.random" : "schedule.manual", name)));
         }
         if (lines.isEmpty()) {
             lines.add(messages.get(sender, "schedule.empty"));
         }
         return lines;
+    }
+
+    private static boolean randomOnly(EventidePlugin plugin, EventDefinition definition) {
+        return definition.random().isPresent() && plugin.randomEvents().running();
     }
 }

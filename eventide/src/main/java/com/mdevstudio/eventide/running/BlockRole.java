@@ -8,4 +8,9 @@ public interface BlockRole {
 
     /** A right click with the main hand. The vanilla interaction is already cancelled. */
     void use(Player player);
+
+    /** Whether a punch uses the block too, for things players expect to grab rather than open. */
+    default boolean usedByPunch() {
+        return false;
+    }
 }

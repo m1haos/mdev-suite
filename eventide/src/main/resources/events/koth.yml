@@ -6,6 +6,9 @@ name: "<#B084F5>Царь горы</#B084F5>"
 schedule: ["19:00"]
 min-online: 3
 
+# Takes part in random starts, see random-events in config.yml. Remove to run only by the clock.
+random: {rarity: rare, weight: 10, cooldown: 3h}
+
 location:
   world: world
   center: [0, 0]

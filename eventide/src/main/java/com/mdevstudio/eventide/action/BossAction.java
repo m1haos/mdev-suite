@@ -73,7 +73,7 @@ final class BossAction implements ActionFactory {
         // Phases fire from the highest share down, whatever order they were written in.
         phases.sort((a, b) -> Double.compare(b.at(), a.at()));
         Settings settings = new Settings(
-                MobSpec.parse(section, MobSpec.entityType(section.getString("entity", "wither_skeleton")),
+                MobSpec.parse(section, MobKind.parse(plugin, section.getString("entity", "wither_skeleton")),
                         NamedTextColor.DARK_RED),
                 List.copyOf(phases),
                 section.getInt("points.damage", 50),

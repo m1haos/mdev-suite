@@ -24,6 +24,8 @@ public final class EventActions {
         registry.register("capture-zone", new CaptureZoneAction(plugin));
         registry.register("waves", new WavesAction(plugin));
         registry.register("boss", new BossAction(plugin));
+        registry.register("captain", new CaptainAction(plugin));
+        registry.register("collect", new CollectAction(plugin));
     }
 
     /** Wraps an action that only makes sense inside a running Eventide event. */

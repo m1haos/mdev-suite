@@ -88,6 +88,11 @@ public final class EventLoader {
                 ? Optional.empty()
                 : Optional.of(StructureSpec.parse(buildSection, structures));
 
+        ConfigurationSection randomSection = yaml.getConfigurationSection("random");
+        Optional<RandomSpec> random = randomSection == null
+                ? Optional.empty()
+                : Optional.of(RandomSpec.parse(randomSection));
+
         LocationRule location = LocationRule.parse(yaml.getConfigurationSection("location"), settings.spotCheck(),
                 build);
         RegionRule region;
@@ -106,6 +111,7 @@ public final class EventLoader {
                 location,
                 settings.modules().eventRegion() ? region : region.permissive(),
                 build,
+                random,
                 yaml.getString("loot-table", "default"),
                 places,
                 rewards.parseAll(yaml.getStringList("rewards.participation")),

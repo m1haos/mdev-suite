@@ -35,6 +35,12 @@ zone:
   bar-contested: "<event> <warning>— зона оспаривается.</warning> <gray>Лидер: <white><leader></white> <accent><points>/<goal>"
   won: "<prefix><white><player></white> <gray>удержал зону до победы!"
 
+collect:
+  bar: "<event> <gray>— лидер <white><leader></white> <accent><points>/<goal></accent> <dark_gray>·</dark_gray> <gray>на земле: <white><left>"
+  picked: "<success>+<points></success> <gray>очк. Всего: <white><total>"
+  picked-cursed: "<warning>Проклятая! +<points></warning> <gray>очк., но кто-то вылез. Всего: <white><total>"
+  won: "<prefix><white><player></white> <gray>собрал больше всех!"
+
 marker:
   compass: "<event> <dark_gray>»</dark_gray> <white><distance> м</white> <accent><arrow>"
 
@@ -50,6 +56,15 @@ boss:
   killed: "<prefix><boss> <gray>повержен! Последний удар: <white><player>"
   bar: "<boss> <gray>— фаза <white><phase>"
 
+captain:
+  task-kill: "<prefix><gray>Капитан: убей <white><count></white> монстров рядом с ивентом и возвращайся."
+  task-bring: "<prefix><gray>Капитан: принеси мне <white><count></white> <white><item></white>."
+  progress-kill: "<prefix><gray>Капитан: убито монстров <white><done>/<count></white>."
+  progress-bring: "<prefix><gray>Капитан: у тебя <white><done>/<count></white> <white><item></white>."
+  kill-done: "<prefix><success>Готово. Вернись к капитану за ключом."
+  rewarded: "<prefix><success>Капитан выдал ключ:</success> <rarity>"
+  already: "<prefix><gray>Капитан: больше мне нечего тебе поручить."
+
 shop:
   disabled: "<prefix><gray>Покупка ключей на этом сервере выключена."
   not-for-sale: "<prefix><warning>Ключ <rarity> не продаётся."
@@ -62,6 +77,7 @@ schedule:
   running: "<event> <success>идёт сейчас</success> <gray>— <white><x> <z></white> <dark_gray>(<world>)</dark_gray>"
   next: "<event> <gray>— следующий в <white><time>"
   manual: "<event> <gray>— только по команде администратора"
+  random: "<event> <gray>— в случайное время"
   empty: "<gray>Ивентов пока нет."
   disabled: "<prefix><gray>Расписание ивентов на этом сервере скрыто."
 
@@ -133,4 +149,19 @@ help:
   givekey: "<white>/eventide givekey <игрок> <редкость> [кол-во]</white> <gray>— выдать ключ. Ещё: <white><aliases>"
   buykey: "<white>/eventide buykey <редкость> [кол-во]</white> <gray>— купить ключ. Ещё: <white><aliases>"
   loot: "<white>/eventide loot</white> <gray>— редактор лута. Ещё: <white><aliases>"
+  random: "<white>/eventide random [pause|resume|roll]</white> <gray>— случайные ивенты: когда следующий, пауза, бросить сейчас. Ещё: <white><aliases>"
   reload: "<white>/eventide reload</white> <gray>— перечитать настройки. Ещё: <white><aliases>"
+
+random:
+  disabled: "<prefix><gray>Случайные ивенты выключены (modules.random-events в config.yml)."
+  status-next: "<prefix><gray>Следующий бросок в <white><time></white>, через <white><in></white>."
+  status-paused: "<prefix><warning>Случайные ивенты на паузе.</warning> <gray>Продолжить: /eventide random resume"
+  no-cooldowns: "<gray>  Кулдаунов нет."
+  rarity-cooldown: "<gray>  Редкость <white><rarity></white>: ещё <white><left>"
+  event-cooldown: "<gray>  <event><gray>: ещё <white><left>"
+  paused: "<prefix><gray>Случайные ивенты на паузе. Ивенты по расписанию идут как обычно."
+  resumed: "<prefix><success>Случайные ивенты снова идут."
+  rolled: "<prefix><gray>Выпало: <event> <dark_gray>(<rarity>)</dark_gray><gray>. Ищу место..."
+  nothing: "<prefix><warning>Нечего запускать:</warning> <gray>все ивенты с блоком random на кулдауне, уже идут или их нет."
+  too-many: "<prefix><warning>Уже идёт <max> ивент(ов) (random-events.max-concurrent в config.yml)."
+  start-failed: "<prefix><error>Выпал <event><error>, но он не запустился:</error> <gray><reason>"

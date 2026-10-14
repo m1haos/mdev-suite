@@ -6,6 +6,9 @@ name: "<#5DADE2>Сброс груза</#5DADE2>"
 schedule: ["16:00", "20:00"]
 min-online: 2
 
+# Takes part in random starts, see random-events in config.yml. Remove to run only by the clock.
+random: {rarity: common, weight: 10, cooldown: 1h}
+
 location:
   world: world
   center: [0, 0]

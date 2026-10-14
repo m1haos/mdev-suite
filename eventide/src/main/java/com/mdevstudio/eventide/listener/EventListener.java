@@ -3,6 +3,8 @@ package com.mdevstudio.eventide.listener;
 import java.util.List;
 
 import com.mdevstudio.eventide.EventidePlugin;
+import com.mdevstudio.eventide.running.BlockRole;
+import com.mdevstudio.eventide.running.EntityRole;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -19,6 +21,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -35,7 +38,17 @@ public final class EventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onInteract(PlayerInteractEvent event) {
         Block block = event.getClickedBlock();
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || block == null) {
+        if (block == null) {
+            return;
+        }
+        if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+            plugin.manager().roleOf(block).filter(BlockRole::usedByPunch).ifPresent(role -> {
+                event.setCancelled(true);
+                role.use(event.getPlayer());
+            });
+            return;
+        }
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
             return;
         }
         plugin.manager().roleOf(block).ifPresent(role -> {
@@ -43,6 +56,17 @@ public final class EventListener implements Listener {
             event.setCancelled(true);
             if (event.getHand() == EquipmentSlot.HAND) {
                 role.use(event.getPlayer());
+            }
+        });
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onInteractEntity(PlayerInteractEntityEvent event) {
+        plugin.manager().roleOf(event.getRightClicked()).filter(EntityRole::interactive).ifPresent(role -> {
+            // Cancel for both hands so a villager never opens its trade screen; act on the main hand only.
+            event.setCancelled(true);
+            if (event.getHand() == EquipmentSlot.HAND) {
+                role.interacted(event.getPlayer());
             }
         });
     }

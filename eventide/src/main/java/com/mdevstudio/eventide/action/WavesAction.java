@@ -42,7 +42,7 @@ final class WavesAction implements ActionFactory {
 
     private final EventidePlugin plugin;
 
-    private record Wave(Map<EntityType, Integer> mobs, MobSpec spec) {
+    private record Wave(Map<MobKind, Integer> mobs, MobSpec spec) {
 
         int size() {
             return mobs.values().stream().mapToInt(Integer::intValue).sum();
@@ -101,16 +101,16 @@ final class WavesAction implements ActionFactory {
         return EventActions.forEvent(event -> new Siege(event, settings).nextWave());
     }
 
-    private static Wave parseWave(ConfigurationSection wave, NamedTextColor glow) {
+    private Wave parseWave(ConfigurationSection wave, NamedTextColor glow) {
         ConfigurationSection mobs = wave.getConfigurationSection("mobs");
         if (mobs == null || mobs.getKeys(false).isEmpty()) {
             throw new IllegalArgumentException("'mobs' is required, e.g. {zombie: 6, skeleton: 2}");
         }
-        Map<EntityType, Integer> counts = new LinkedHashMap<>();
+        Map<MobKind, Integer> counts = new LinkedHashMap<>();
         for (String type : mobs.getKeys(false)) {
-            counts.put(MobSpec.entityType(type), Math.max(0, mobs.getInt(type)));
+            counts.put(MobKind.parse(plugin, type), Math.max(0, mobs.getInt(type)));
         }
-        return new Wave(counts, MobSpec.parse(wave, EntityType.ZOMBIE, glow));
+        return new Wave(counts, MobSpec.parse(wave, MobKind.vanilla(EntityType.ZOMBIE), glow));
     }
 
     private final class Siege implements EntityRole {
@@ -137,8 +137,8 @@ final class WavesAction implements ActionFactory {
             plugin.playEffect(settings.startEffect(), center);
             broadcast("waves.started");
             current.mobs().forEach((type, count) -> {
-                MobSpec spec = delayGlow ? current.spec().withType(type).withoutGlow()
-                        : current.spec().withType(type);
+                MobSpec spec = delayGlow ? current.spec().withKind(type).withoutGlow()
+                        : current.spec().withKind(type);
                 for (int i = 0; i < count; i++) {
                     Location spot = Spots.randomSurface(center, settings.spread());
                     if (spot != null) {

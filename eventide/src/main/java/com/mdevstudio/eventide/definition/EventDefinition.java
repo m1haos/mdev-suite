@@ -17,6 +17,7 @@ public record EventDefinition(
         LocationRule location,
         RegionRule region,
         Optional<StructureSpec> structure,
+        Optional<RandomSpec> random,
         String lootTable,
         Map<Integer, List<Reward>> placeRewards,
         List<Reward> participationRewards,

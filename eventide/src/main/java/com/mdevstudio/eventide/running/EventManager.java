@@ -95,6 +95,7 @@ public final class EventManager {
                     }
                     ActiveEvent event = new ActiveEvent(plugin, definition, lootTable, location, build);
                     active.put(id, event);
+                    plugin.randomEvents().eventStarted(definition);
                     event.begin();
                 }));
         return StartResult.STARTING;

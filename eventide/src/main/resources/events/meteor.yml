@@ -9,6 +9,9 @@ schedule: ["14:00", "18:00", "21:00"]
 # A scheduled start is skipped when fewer players are online. /eventide start ignores this.
 min-online: 2
 
+# Takes part in random starts, see random-events in config.yml. Remove to run only by the clock.
+random: {rarity: common, weight: 10, cooldown: 1h}
+
 location:
   world: world
   # Center of the search area, x and z.
@@ -44,7 +47,7 @@ effects:
 # Stage actions:
 #   broadcast, title, actionbar, sound, command, effect          (from MDevCore)
 #   countdown, spawn-loot, spawn-guards, airdrop, capture-zone,
-#   waves, boss                                                  (from Eventide)
+#   waves, boss, captain                                         (from Eventide)
 #
 # A stage can also wait for a signal instead of a timer:
 #   - wait-for: boss-killed   # caches-opened, guards-killed, airdrop-captured, zone-won,
@@ -86,6 +89,7 @@ stages:
         # Caches land within this many blocks of the center. Keep it under 24.
         spread: 12
       - type: spawn-guards
+        # A vanilla mob, or a MythicMobs one: entity: "mythic:MeteorGuard"
         entity: zombie
         # Guards glow through walls: a colour (gold, red, aqua, ...), true or false.
         glow: gold
@@ -102,6 +106,16 @@ stages:
           spawn: guard-spawn
           death: guard-death
           key-drop: key-drop
+      # The captain trades a key for a task: kill monsters near the meteor.
+      - type: captain
+        name: "<#5EC8FF>Капитан разведки"
+        rarity: rare
+        spread: 6
+        per-player: 1
+        points: 3
+        dialog:
+          - "<#5EC8FF>Капитан <dark_gray>»</dark_gray> <gray>Стражи не подпустят вас к тайникам. Помогите их проредить."
+        task: {type: kill, count: 5}
       - type: countdown
         duration: 10m
         title: "<event> <gray>— <white><x> <z></white>, осталось <white><time>"

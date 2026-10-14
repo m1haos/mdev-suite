@@ -22,6 +22,7 @@ tiers:
   common:
     rolls: 2-3
     loot:
+      # Items of ItemsAdder, Nexo or CraftEngine: item: "nexo:ruby", "itemsadder:gems:ruby", "craftengine:default:ruby"
       - item: iron_ingot
         amount: 4-10
         weight: 30

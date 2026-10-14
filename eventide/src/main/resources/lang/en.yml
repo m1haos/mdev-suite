@@ -35,6 +35,12 @@ zone:
   bar-contested: "<event> <warning>— the zone is contested.</warning> <gray>Leader: <white><leader></white> <accent><points>/<goal>"
   won: "<prefix><white><player></white> <gray>held the zone to victory!"
 
+collect:
+  bar: "<event> <gray>— leader <white><leader></white> <accent><points>/<goal></accent> <dark_gray>·</dark_gray> <gray>on the ground: <white><left>"
+  picked: "<success>+<points></success> <gray>pts. Total: <white><total>"
+  picked-cursed: "<warning>Cursed! +<points></warning> <gray>pts, but something got out. Total: <white><total>"
+  won: "<prefix><white><player></white> <gray>collected the most!"
+
 marker:
   compass: "<event> <dark_gray>»</dark_gray> <white><distance> m</white> <accent><arrow>"
 
@@ -50,6 +56,15 @@ boss:
   killed: "<prefix><boss> <gray>is defeated! Final blow: <white><player>"
   bar: "<boss> <gray>— phase <white><phase>"
 
+captain:
+  task-kill: "<prefix><gray>Captain: kill <white><count></white> monsters near the event and come back."
+  task-bring: "<prefix><gray>Captain: bring me <white><count></white> <white><item></white>."
+  progress-kill: "<prefix><gray>Captain: monsters killed <white><done>/<count></white>."
+  progress-bring: "<prefix><gray>Captain: you carry <white><done>/<count></white> <white><item></white>."
+  kill-done: "<prefix><success>Done. Go back to the captain for your key."
+  rewarded: "<prefix><success>The captain gave you a key:</success> <rarity>"
+  already: "<prefix><gray>Captain: I have nothing more for you."
+
 shop:
   disabled: "<prefix><gray>Buying keys is turned off on this server."
   not-for-sale: "<prefix><warning>The <rarity> key is not for sale."
@@ -62,6 +77,7 @@ schedule:
   running: "<event> <success>running now</success> <gray>— <white><x> <z></white> <dark_gray>(<world>)</dark_gray>"
   next: "<event> <gray>— next at <white><time>"
   manual: "<event> <gray>— started by admins only"
+  random: "<event> <gray>— at a random time"
   empty: "<gray>No events yet."
   disabled: "<prefix><gray>The event schedule is hidden on this server."
 
@@ -133,4 +149,19 @@ help:
   givekey: "<white>/eventide givekey <player> <rarity> [amount]</white> <gray>— give a key. Also: <white><aliases>"
   buykey: "<white>/eventide buykey <rarity> [amount]</white> <gray>— buy a key. Also: <white><aliases>"
   loot: "<white>/eventide loot</white> <gray>— loot editor. Also: <white><aliases>"
+  random: "<white>/eventide random [pause|resume|roll]</white> <gray>— random events: next roll, pause, roll now. Also: <white><aliases>"
   reload: "<white>/eventide reload</white> <gray>— reload settings. Also: <white><aliases>"
+
+random:
+  disabled: "<prefix><gray>Random events are off (modules.random-events in config.yml)."
+  status-next: "<prefix><gray>Next roll at <white><time></white>, in <white><in></white>."
+  status-paused: "<prefix><warning>Random events are paused.</warning> <gray>Resume: /eventide random resume"
+  no-cooldowns: "<gray>  No cooldowns."
+  rarity-cooldown: "<gray>  Rarity <white><rarity></white>: <white><left></white> left"
+  event-cooldown: "<gray>  <event><gray>: <white><left></white> left"
+  paused: "<prefix><gray>Random events paused. Scheduled events run as usual."
+  resumed: "<prefix><success>Random events are back on."
+  rolled: "<prefix><gray>Rolled: <event> <dark_gray>(<rarity>)</dark_gray><gray>. Looking for a spot..."
+  nothing: "<prefix><warning>Nothing to start:</warning> <gray>every event with a random block is on cooldown, running, or there are none."
+  too-many: "<prefix><warning><max> event(s) already running (random-events.max-concurrent in config.yml)."
+  start-failed: "<prefix><error>Rolled <event><error>, but it did not start:</error> <gray><reason>"

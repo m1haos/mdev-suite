@@ -51,11 +51,11 @@ public final class EventidePlaceholders extends PlaceholderExpansion {
     private record Active(String name, String id, String world, int x, int y, int z, String leader, int leaderPoints) {
     }
 
-    private record Snapshot(Next next, Active active, Map<UUID, Integer> points) {
+    private record Snapshot(Next next, Active active, Map<UUID, Integer> points, Duration nextRandom) {
     }
 
     private final EventidePlugin plugin;
-    private volatile Snapshot snapshot = new Snapshot(null, null, Map.of());
+    private volatile Snapshot snapshot = new Snapshot(null, null, Map.of(), null);
 
     private EventidePlaceholders(EventidePlugin plugin) {
         this.plugin = plugin;
@@ -91,6 +91,9 @@ public final class EventidePlaceholders extends PlaceholderExpansion {
     public String onRequest(OfflinePlayer player, @NotNull String params) {
         String key = params.toLowerCase(Locale.ROOT);
         Snapshot current = snapshot;
+        if (key.equals("next_random")) {
+            return current.nextRandom() == null ? "" : Durations.clock(current.nextRandom());
+        }
         if (key.startsWith("next")) {
             return next(key, current.next());
         }
@@ -134,7 +137,7 @@ public final class EventidePlaceholders extends PlaceholderExpansion {
             }
             event.score().ranking().forEach(entry -> points.merge(entry.getKey(), entry.getValue(), Integer::sum));
         }
-        snapshot = new Snapshot(next, active, Map.copyOf(points));
+        snapshot = new Snapshot(next, active, Map.copyOf(points), plugin.randomEvents().untilNextRoll().orElse(null));
     }
 
     private static String next(String key, Next next) {

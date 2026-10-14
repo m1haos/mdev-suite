@@ -26,6 +26,7 @@ import com.mdevstudio.eventide.loot.RarityLoader;
 import com.mdevstudio.eventide.running.EventManager;
 import com.mdevstudio.eventide.running.MobGlow;
 import com.mdevstudio.eventide.running.PlacedStructure;
+import com.mdevstudio.eventide.running.RandomEvents;
 import com.mdevstudio.eventide.running.EventScheduler;
 import com.mdevstudio.eventide.running.EventStats;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -44,6 +45,7 @@ public final class EventidePlugin extends JavaPlugin {
     private Map<String, EventDefinition> definitions = Map.of();
     private EventManager manager;
     private EventScheduler scheduler;
+    private RandomEvents randomEvents;
     private KeyItems keys;
     private Claims claims = Claims.none();
 
@@ -58,6 +60,7 @@ public final class EventidePlugin extends JavaPlugin {
         // Glow teams live in the world's scoreboard file and outlast a crash.
         MobGlow.clearAll();
         scheduler = new EventScheduler(this);
+        randomEvents = new RandomEvents(this);
         keys = new KeyItems(this, text());
         reload();
 
@@ -82,6 +85,9 @@ public final class EventidePlugin extends JavaPlugin {
         if (scheduler != null) {
             scheduler.stop();
         }
+        if (randomEvents != null) {
+            randomEvents.stop();
+        }
         if (manager != null) {
             manager.stopAll();
         }
@@ -100,10 +106,21 @@ public final class EventidePlugin extends JavaPlugin {
                 .filter(definition -> !lootTables.containsKey(definition.lootTable()))
                 .forEach(definition -> getSLF4JLogger().warn("events/{}.yml uses loot table '{}' that does not exist",
                         definition.id(), definition.lootTable()));
+        definitions.values().stream()
+                .filter(definition -> definition.random().isPresent()
+                        && !settings.random().tiers().containsKey(definition.random().get().rarity()))
+                .forEach(definition -> getSLF4JLogger().warn("events/{}.yml: random.rarity '{}' is not in "
+                        + "random-events.rarities of config.yml; the event is never picked by random rolls",
+                        definition.id(), definition.random().get().rarity()));
         if (settings.modules().scheduler()) {
             scheduler.start();
         } else {
             scheduler.stop();
+        }
+        if (settings.modules().randomEvents()) {
+            randomEvents.start();
+        } else {
+            randomEvents.stop();
         }
     }
 
@@ -157,6 +174,10 @@ public final class EventidePlugin extends JavaPlugin {
 
     public EventScheduler scheduler() {
         return scheduler;
+    }
+
+    public RandomEvents randomEvents() {
+        return randomEvents;
     }
 
     public Claims claims() {

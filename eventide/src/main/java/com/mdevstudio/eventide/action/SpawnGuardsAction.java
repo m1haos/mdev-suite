@@ -34,7 +34,7 @@ final class SpawnGuardsAction implements ActionFactory {
 
     @Override
     public ScenarioAction create(ConfigurationSection settings) {
-        MobSpec mob = MobSpec.parse(settings, MobSpec.entityType(settings.getString("entity", "zombie")),
+        MobSpec mob = MobSpec.parse(settings, MobKind.parse(plugin, settings.getString("entity", "zombie")),
                 NamedTextColor.GOLD);
         int count = Math.max(1, settings.getInt("count", 5));
         int spread = Math.max(1, settings.getInt("spread", 8));

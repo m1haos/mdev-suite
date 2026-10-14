@@ -20,6 +20,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 /**
  * King of the hill: every second in the zone gives points, the leader is shown in a boss bar.
@@ -40,6 +41,7 @@ final class CaptureZoneAction implements ActionFactory {
     private record Settings(
             double radius,
             double height,
+            Vector offset,
             int pointsPerSecond,
             int winScore,
             Contest contest,
@@ -58,6 +60,7 @@ final class CaptureZoneAction implements ActionFactory {
         Settings settings = new Settings(
                 Math.max(1, section.getDouble("radius", 6)),
                 Math.max(1, section.getDouble("height", 4)),
+                offset(section.getDoubleList("offset")),
                 Math.max(1, section.getInt("points-per-second", 1)),
                 Math.max(0, section.getInt("win-score", 0)),
                 EventActions.enumValue(Contest.class, section.getString("contested", "nobody")),
@@ -67,6 +70,16 @@ final class CaptureZoneAction implements ActionFactory {
                 Math.max(10, Durations.toTicks(Durations.parse(section.getString("effects.border-every", "2s")))));
 
         return EventActions.forEvent(event -> new Zone(event, settings).start());
+    }
+
+    private static Vector offset(List<Double> values) {
+        if (values.isEmpty()) {
+            return new Vector();
+        }
+        if (values.size() != 3) {
+            throw new IllegalArgumentException("capture-zone: offset must be [x, y, z]");
+        }
+        return new Vector(values.get(0), values.get(1), values.get(2));
     }
 
     private final class Zone {
@@ -80,7 +93,7 @@ final class CaptureZoneAction implements ActionFactory {
         Zone(ActiveEvent event, Settings settings) {
             this.event = event;
             this.settings = settings;
-            this.center = event.location();
+            this.center = event.location().clone().add(settings.offset());
         }
 
         void start() {

@@ -10,6 +10,7 @@ repositories {
     maven("https://jitpack.io")
     maven("https://repo.incredibleplugins.com/releases")
     maven("https://repo.glaremasters.me/repository/towny/")
+    maven("https://mvn.lumine.io/repository/maven-public/")
 }
 
 dependencies {
@@ -22,6 +23,7 @@ dependencies {
     compileOnly("com.github.GriefPrevention:GriefPrevention:16.18.2") { isTransitive = false }
     compileOnly("com.incredibleplugins:lands-api:7.28.1") { isTransitive = false }
     compileOnly("com.palmergames.bukkit.towny:towny:0.103.2.0") { isTransitive = false }
+    compileOnly("io.lumine:Mythic-Dist:5.12.1") { isTransitive = false }
 }
 
 tasks.jar {

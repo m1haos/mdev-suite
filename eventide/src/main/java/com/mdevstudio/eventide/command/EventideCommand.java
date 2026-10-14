@@ -1,8 +1,11 @@
 package com.mdevstudio.eventide.command;
 
+import java.time.Duration;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -10,6 +13,7 @@ import java.util.function.Function;
 import com.mdevstudio.core.MDevCore;
 import com.mdevstudio.core.economy.Money;
 import com.mdevstudio.core.reward.BuiltinRewards;
+import com.mdevstudio.core.util.Durations;
 import com.mdevstudio.eventide.EventidePlugin;
 import com.mdevstudio.eventide.EventideSettings;
 import com.mdevstudio.eventide.definition.EventDefinition;
@@ -17,6 +21,7 @@ import com.mdevstudio.eventide.loot.Rarity;
 import com.mdevstudio.eventide.menu.LootEditor;
 import com.mdevstudio.eventide.menu.ScheduleDialog;
 import com.mdevstudio.eventide.running.ActiveEvent;
+import com.mdevstudio.eventide.running.RandomEvents;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -53,9 +58,12 @@ public final class EventideCommand {
     public static final String GIVE_KEY = "givekey";
     public static final String BUY_KEY = "buykey";
     public static final String LOOT = "loot";
+    public static final String RANDOM = "random";
     public static final String RELOAD = "reload";
     public static final List<String> SUBCOMMANDS = List.of(HELP, START, STOP, TELEPORT, GIVE_KEY, BUY_KEY,
-            LOOT, RELOAD);
+            LOOT, RANDOM, RELOAD);
+
+    private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("HH:mm");
 
     private final EventidePlugin plugin;
 
@@ -75,6 +83,7 @@ public final class EventideCommand {
         add(root, GIVE_KEY, this::giveKeyCommand);
         add(root, BUY_KEY, this::buyKeyCommand);
         add(root, LOOT, this::lootCommand);
+        add(root, RANDOM, this::randomCommand);
         add(root, RELOAD, this::reloadCommand);
         return root.build();
     }
@@ -97,6 +106,7 @@ public final class EventideCommand {
             helpLine(sender, GIVE_KEY, "help.givekey");
             helpLine(sender, BUY_KEY, "help.buykey");
             helpLine(sender, LOOT, "help.loot");
+            helpLine(sender, RANDOM, "help.random");
             helpLine(sender, RELOAD, "help.reload");
             return Command.SINGLE_SUCCESS;
         });
@@ -225,6 +235,15 @@ public final class EventideCommand {
                 });
     }
 
+    private LiteralArgumentBuilder<CommandSourceStack> randomCommand(String name) {
+        return Commands.literal(name)
+                .requires(this::isAdmin)
+                .executes(this::randomStatus)
+                .then(Commands.literal("pause").executes(context -> setRandomPaused(context, true)))
+                .then(Commands.literal("resume").executes(context -> setRandomPaused(context, false)))
+                .then(Commands.literal("roll").executes(this::randomRoll));
+    }
+
     private LiteralArgumentBuilder<CommandSourceStack> reloadCommand(String name) {
         return Commands.literal(name)
                 .requires(this::isAdmin)
@@ -265,6 +284,69 @@ public final class EventideCommand {
         String key = plugin.manager().stop(id) ? "command.stopped" : "command.not-running";
         plugin.messages().send(sender(context), key, Placeholder.unparsed("id", id));
         return Command.SINGLE_SUCCESS;
+    }
+
+    private int randomStatus(CommandContext<CommandSourceStack> context) {
+        CommandSender sender = sender(context);
+        RandomEvents random = plugin.randomEvents();
+        if (!random.running()) {
+            plugin.messages().send(sender, "random.disabled");
+            return 0;
+        }
+        if (random.paused()) {
+            plugin.messages().send(sender, "random.status-paused");
+        } else {
+            plugin.messages().send(sender, "random.status-next",
+                    Placeholder.unparsed("time", TIME.format(random.nextRoll().atZone(plugin.settings().timezone()))),
+                    Placeholder.unparsed("in", Durations.clock(random.untilNextRoll().orElse(Duration.ZERO))));
+        }
+        Map<String, Duration> rarities = random.rarityCooldowns();
+        Map<String, Duration> events = random.eventCooldowns();
+        if (rarities.isEmpty() && events.isEmpty()) {
+            plugin.messages().send(sender, "random.no-cooldowns");
+            return Command.SINGLE_SUCCESS;
+        }
+        rarities.forEach((id, left) -> plugin.messages().send(sender, "random.rarity-cooldown",
+                Placeholder.unparsed("rarity", id), Placeholder.unparsed("left", Durations.clock(left))));
+        events.forEach((id, left) -> plugin.messages().send(sender, "random.event-cooldown",
+                Placeholder.parsed("event", Optional.ofNullable(plugin.definitions().get(id))
+                        .map(EventDefinition::displayName).orElse(id)),
+                Placeholder.unparsed("left", Durations.clock(left))));
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int setRandomPaused(CommandContext<CommandSourceStack> context, boolean paused) {
+        CommandSender sender = sender(context);
+        if (!plugin.randomEvents().running()) {
+            plugin.messages().send(sender, "random.disabled");
+            return 0;
+        }
+        plugin.randomEvents().setPaused(paused);
+        plugin.messages().send(sender, paused ? "random.paused" : "random.resumed");
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int randomRoll(CommandContext<CommandSourceStack> context) {
+        CommandSender sender = sender(context);
+        if (!plugin.randomEvents().running()) {
+            plugin.messages().send(sender, "random.disabled");
+            return 0;
+        }
+        RandomEvents.Roll roll = plugin.randomEvents().roll(true);
+        if (roll.skip() == null) {
+            plugin.messages().send(sender, "random.rolled",
+                    Placeholder.parsed("event", roll.event().displayName()),
+                    Placeholder.unparsed("rarity", roll.rarity()));
+            return Command.SINGLE_SUCCESS;
+        }
+        plugin.messages().send(sender, switch (roll.skip()) {
+            case TOO_MANY_RUNNING -> "random.too-many";
+            case START_FAILED -> "random.start-failed";
+            default -> "random.nothing";
+        }, Placeholder.parsed("event", roll.event() == null ? "" : roll.event().displayName()),
+                Placeholder.unparsed("reason", roll.reason() == null ? "" : roll.reason()),
+                Placeholder.unparsed("max", Integer.toString(plugin.settings().random().maxConcurrent())));
+        return 0;
     }
 
     private int giveKey(CommandContext<CommandSourceStack> context, int amount) throws CommandSyntaxException {

@@ -1,4 +1,4 @@
-config-version: 6
+config-version: 8
 
 # Eventide settings.
 # Events are in the events folder, loot tables in the loot folder, rarities and keys
@@ -28,6 +28,7 @@ commands:
     givekey: [key, give]
     buykey: [buy]
     loot: [editor]
+    random: [rnd]
     reload: [rl]
 
 
@@ -45,11 +46,53 @@ schedule:
   menu: dialog
 
 
+# Events picked by chance instead of by the clock. Only events with a "random" block in their file
+# take part, e.g. in events/siege.yml:
+#   random: {rarity: rare, weight: 10, cooldown: 3h, min-online: 5}
+#     rarity      one of the rarities below
+#     weight      how often it is picked among events of the same rarity (default 1)
+#     cooldown    how long after any start of this event it cannot be rolled again (default none)
+#     min-online  players needed for this event, on top of min-online of the event (default 0)
+# /eventide random shows the next roll and the cooldowns; pause, resume and roll control it.
+# The timer and cooldowns are kept in random-state.yml and survive restarts.
+random-events:
+  # Time between rolls, and how much it may vary either way. 90m and 20% give 72 to 108 minutes.
+  interval: 90m
+  jitter: 20%
+
+  # The first roll after a server start waits at least this long.
+  first-delay: 15m
+
+  # A roll is skipped when fewer players are online. The timer simply goes on, missed rolls are not made up.
+  min-online: 3
+
+  # A roll is skipped while this many events run, started by any means.
+  max-concurrent: 1
+
+  # Rolls happen only within these hours, in schedule.timezone. A range may cross midnight: "22:00-02:00".
+  # An empty list [] allows any time.
+  windows: ["10:00-23:30"]
+
+  # A roll first picks a rarity by chance, then an event of that rarity by weight. Only rarities that
+  # have an event ready right now (not on cooldown, enough players) take part, so chances are relative.
+  # cooldown: after an event of this rarity starts, the rarity is not rolled for this long.
+  # Add your own ids freely; these are not the cache rarities from rarities.yml.
+  rarities:
+    - {id: common,    chance: 60, cooldown: 30m}
+    - {id: rare,      chance: 28, cooldown: 2h}
+    - {id: epic,      chance: 10, cooldown: 5h}
+    - {id: legendary, chance: 2,  cooldown: 12h, min-online: 10}
+
+
 # Every system can be turned off separately. Event files stay the same:
 # the parts that belong to a disabled system are simply skipped.
 modules:
   # Start events by the times in their files. Off = only /eventide start.
   scheduler: true
+
+  # Start events on their own at random times, see random-events below.
+  # Off = events run only by their times and by command.
+  random-events: true
 
   # Boss bar countdowns from "countdown" stages.
   countdown-bar: true
@@ -72,6 +115,9 @@ modules:
     # prices are set per tier in the loot tables.
     shop: false
 
+    # Captain NPCs from "captain" stages give a key for a small task.
+    captain: true
+
   # Points and the top-3 message at the end of an event.
   leaderboard: true
 
@@ -88,6 +134,10 @@ modules:
   # Guards, wave mobs and bosses glow through walls, in the colour set by "glow" in event files.
   # Players whose scoreboard is replaced by another plugin (TAB and the like) see a white outline.
   mob-glow: true
+
+  # "mythic:<id>" in "entity" and in wave "mobs" spawns a MythicMobs mob. Needs the MythicMobs plugin.
+  # Off = event files with such mobs are skipped with a message in the console.
+  mythic-mobs: true
 
   # "marker" stages: an effect over the event spot until the end, and the distance and direction
   # to it in the action bar of players nearby.

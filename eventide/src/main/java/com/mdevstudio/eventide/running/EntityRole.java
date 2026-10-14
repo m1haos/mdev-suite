@@ -10,6 +10,14 @@ public interface EntityRole {
     default void damaged(Player attacker, double damage) {
     }
 
+    /** Whether a right click on the mob goes to {@link #interacted} instead of the vanilla screen. */
+    default boolean interactive() {
+        return false;
+    }
+
+    default void interacted(Player player) {
+    }
+
     /** The role decides what drops: {@code event.getDrops()} still holds the vanilla loot. */
     void died(EntityDeathEvent event, Player killer);
 }

@@ -48,7 +48,7 @@ public final class ActiveEvent implements ScenarioContext {
     private ScenarioRun run;
     private boolean finished;
 
-    // build is null for events without a structure.
+    // build is null when the event has no structure to roll back.
     ActiveEvent(EventidePlugin plugin, EventDefinition definition, LootTable lootTable, Location location,
             PlacedStructure build) {
         this.plugin = plugin;

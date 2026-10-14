@@ -37,7 +37,7 @@ public record SurfaceRule(boolean checked, int radius, int maxHeightDifference, 
                 base.checked(),
                 Math.max(0, section.getInt("radius", base.radius())),
                 Math.max(0, section.getInt("max-height-difference", base.maxHeightDifference())),
-                section.contains("min-ground") ? share(section.getString("min-ground", "")) : base.minGround(),
+                section.contains("min-ground") ? share(section.getString("min-ground")) : base.minGround(),
                 section.contains("ground") ? ground(section.getStringList("ground")) : base.ground());
     }
 

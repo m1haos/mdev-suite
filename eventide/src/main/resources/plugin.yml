@@ -6,7 +6,7 @@ description: Multi-stage server events built from stages
 authors: [M/Dev Studio]
 website: ''
 depend: [MDevCore]
-softdepend: [PlaceholderAPI, Vault, WorldGuard, GriefPrevention, Lands, Towny]
+softdepend: [PlaceholderAPI, Vault, WorldGuard, GriefPrevention, Lands, Towny, MythicMobs]
 
 permissions:
   eventide.admin:

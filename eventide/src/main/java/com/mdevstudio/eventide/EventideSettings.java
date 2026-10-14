@@ -16,6 +16,7 @@ import com.mdevstudio.core.util.Durations;
 import com.mdevstudio.eventide.command.EventideCommand;
 import com.mdevstudio.eventide.definition.RegionRule;
 import com.mdevstudio.eventide.definition.SurfaceRule;
+import com.mdevstudio.eventide.running.RandomSettings;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.slf4j.Logger;
@@ -32,11 +33,13 @@ public record EventideSettings(
         RegionRule eventRegion,
         int claimMargin,
         Set<String> ignoredWorldGuardRegions,
+        RandomSettings random,
         CommandNames commands) {
 
     // Every system of the plugin can be switched off without touching event files.
     public record Modules(
             boolean scheduler,
+            boolean randomEvents,
             boolean countdownBar,
             boolean guards,
             Keys keys,
@@ -45,6 +48,7 @@ public record EventideSettings(
             boolean effects,
             boolean cacheGlow,
             boolean mobGlow,
+            boolean mythicMobs,
             boolean marker,
             boolean stats,
             boolean placeholders,
@@ -56,6 +60,7 @@ public record EventideSettings(
         static Modules from(ConfigurationSection section) {
             return new Modules(
                     enabled(section, "scheduler"),
+                    enabled(section, "random-events"),
                     enabled(section, "countdown-bar"),
                     enabled(section, "guards"),
                     Keys.from(section),
@@ -64,6 +69,7 @@ public record EventideSettings(
                     enabled(section, "effects"),
                     enabled(section, "cache-glow"),
                     enabled(section, "mob-glow"),
+                    enabled(section, "mythic-mobs"),
                     enabled(section, "marker"),
                     enabled(section, "stats"),
                     enabled(section, "placeholders"),
@@ -75,19 +81,20 @@ public record EventideSettings(
     }
 
     /** Whether caches need keys, and each way a player can get one. */
-    public record Keys(boolean enabled, boolean fromGuards, boolean asReward, boolean shop) {
+    public record Keys(boolean enabled, boolean fromGuards, boolean asReward, boolean shop, boolean captain) {
 
         static Keys from(ConfigurationSection modules) {
             if (modules != null && modules.isBoolean("keys")) {
                 boolean on = modules.getBoolean("keys");
-                return new Keys(on, on, on, false);
+                return new Keys(on, on, on, false, on);
             }
             ConfigurationSection keys = modules == null ? null : modules.getConfigurationSection("keys");
             return new Keys(
                     EventideSettings.enabled(keys, "enabled"),
                     EventideSettings.enabled(keys, "from-guards"),
                     EventideSettings.enabled(keys, "as-reward"),
-                    keys != null && keys.getBoolean("shop", false));
+                    keys != null && keys.getBoolean("shop", false),
+                    EventideSettings.enabled(keys, "captain"));
         }
     }
 
@@ -179,8 +186,9 @@ public record EventideSettings(
 
         Modules modules = Modules.from(yaml.getConfigurationSection("modules"));
         Keys keys = modules.keys();
-        if (keys.enabled() && !(keys.fromGuards() && modules.guards()) && !keys.asReward() && !keys.shop()) {
-            logger.warn("config.yml: caches need keys, but no key source is on (guards, rewards, shop). "
+        boolean guardKeys = keys.fromGuards() && modules.guards();
+        if (keys.enabled() && !guardKeys && !keys.asReward() && !keys.shop() && !keys.captain()) {
+            logger.warn("config.yml: caches need keys, but no key source is on (guards, rewards, shop, captain). "
                     + "Only /eventide givekey can hand them out. Turn modules.keys.enabled off to open caches freely.");
         }
 
@@ -221,6 +229,7 @@ public record EventideSettings(
                 yaml.getStringList("claims.worldguard-ignore").stream()
                         .map(region -> region.trim().toLowerCase(Locale.ROOT))
                         .collect(Collectors.toUnmodifiableSet()),
+                RandomSettings.parse(yaml.getConfigurationSection("random-events"), logger),
                 CommandNames.from(yaml.getConfigurationSection("commands"), logger));
     }
 
