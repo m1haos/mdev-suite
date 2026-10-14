@@ -24,6 +24,7 @@ import com.mdevstudio.eventide.loot.LootTable;
 import com.mdevstudio.eventide.loot.Rarity;
 import com.mdevstudio.eventide.loot.RarityLoader;
 import com.mdevstudio.eventide.running.EventManager;
+import com.mdevstudio.eventide.running.LooseBlocks;
 import com.mdevstudio.eventide.running.MobGlow;
 import com.mdevstudio.eventide.running.PlacedStructure;
 import com.mdevstudio.eventide.running.RandomEvents;
@@ -46,6 +47,7 @@ public final class EventidePlugin extends JavaPlugin {
     private EventManager manager;
     private EventScheduler scheduler;
     private RandomEvents randomEvents;
+    private LooseBlocks looseBlocks;
     private KeyItems keys;
     private Claims claims = Claims.none();
 
@@ -59,10 +61,12 @@ public final class EventidePlugin extends JavaPlugin {
         PlacedStructure.restoreLeftovers(this);
         // Glow teams live in the world's scoreboard file and outlast a crash.
         MobGlow.clearAll();
+        looseBlocks = new LooseBlocks(this);
         scheduler = new EventScheduler(this);
         randomEvents = new RandomEvents(this);
         keys = new KeyItems(this, text());
         reload();
+        looseBlocks.start();
 
         getServer().getPluginManager().registerEvents(new EventListener(this), this);
         getServer().getPluginManager().registerEvents(new RegionListener(this), this);
@@ -90,6 +94,9 @@ public final class EventidePlugin extends JavaPlugin {
         }
         if (manager != null) {
             manager.stopAll();
+        }
+        if (looseBlocks != null) {
+            looseBlocks.stop();
         }
         MobGlow.clearAll();
     }

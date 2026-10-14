@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import com.mdevstudio.core.scenario.ScenarioContext;
@@ -139,6 +140,10 @@ public final class ActiveEvent implements ScenarioContext {
     /** Stops protecting the block without touching it, e.g. after it was opened and removed. */
     public void release(Block block) {
         blocks.remove(block);
+    }
+
+    Set<Block> claimedBlocks() {
+        return Set.copyOf(blocks.keySet());
     }
 
     public Optional<BlockRole> roleOf(Block block) {

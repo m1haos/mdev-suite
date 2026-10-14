@@ -119,6 +119,12 @@ public final class EventManager {
         releaseChunks(event.location(), event.definition());
     }
 
+    Set<Block> claimedBlocks() {
+        Set<Block> claimed = new HashSet<>();
+        active.values().forEach(event -> claimed.addAll(event.claimedBlocks()));
+        return claimed;
+    }
+
     public Collection<ActiveEvent> active() {
         return List.copyOf(active.values());
     }
