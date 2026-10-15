@@ -137,6 +137,8 @@ modules:
 
   # "mythic:<id>" in "entity" and in wave "mobs" spawns a MythicMobs mob. Needs the MythicMobs plugin.
   # Off = event files with such mobs are skipped with a message in the console.
+  # Eventide changes only the name, stats and gear a file sets; anything else is up to MythicMobs.
+  # Undead that should live through the day need "PreventSunburn: true" in their MythicMobs options.
   mythic-mobs: true
 
   # "marker" stages: an effect over the event spot until the end, and the distance and direction
