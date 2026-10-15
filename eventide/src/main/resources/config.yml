@@ -1,4 +1,4 @@
-config-version: 8
+config-version: 9
 
 # Eventide settings.
 # Events are in the events folder, loot tables in the loot folder, rarities and keys
@@ -140,6 +140,10 @@ modules:
   # Eventide changes only the name, stats and gear a file sets; anything else is up to MythicMobs.
   # Undead that should live through the day need "PreventSunburn: true" in their MythicMobs options.
   mythic-mobs: true
+
+  # "npc: {skin: <player name>}" in a "captain" stage shows the captain as a player NPC of FancyNpcs
+  # with that skin. Needs the FancyNpcs plugin. Off, or without the plugin = the "entity" mob as usual.
+  fancy-npcs: true
 
   # "marker" stages: an effect over the event spot until the end, and the distance and direction
   # to it in the action bar of players nearby.

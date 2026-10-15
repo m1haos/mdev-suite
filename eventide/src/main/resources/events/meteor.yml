@@ -116,6 +116,8 @@ stages:
         dialog:
           - "<#5EC8FF>Капитан <dark_gray>»</dark_gray> <gray>Стражи не подпустят вас к тайникам. Помогите их проредить."
         task: {type: kill, count: 5}
+        # With FancyNpcs installed: a player NPC with this skin instead of a villager.
+        # npc: {skin: Notch}
       - type: countdown
         duration: 10m
         title: "<event> <gray>— <white><x> <z></white>, осталось <white><time>"

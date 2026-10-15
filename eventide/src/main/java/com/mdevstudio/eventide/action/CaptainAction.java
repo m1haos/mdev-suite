@@ -14,6 +14,7 @@ import com.mdevstudio.core.scenario.ScenarioAction;
 import com.mdevstudio.eventide.EventidePlugin;
 import com.mdevstudio.eventide.EventideSettings;
 import com.mdevstudio.eventide.loot.Rarity;
+import com.mdevstudio.eventide.hook.FancyNpcs;
 import com.mdevstudio.eventide.running.ActiveEvent;
 import com.mdevstudio.eventide.running.EntityRole;
 import net.kyori.adventure.text.Component;
@@ -34,6 +35,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 /**
  * A captain NPC who gives a key for a small task: kill some mobs near the event, bring items, or
@@ -64,6 +66,12 @@ final class CaptainAction implements ActionFactory {
         String spawnEffect = settings.getString("effects.spawn");
         String rewardEffect = settings.getString("effects.reward");
         Task task = Task.parse(settings.getConfigurationSection("task"));
+        boolean playerNpc = settings.isConfigurationSection("npc") && fancyNpcsReady();
+        String skin = settings.getString("npc.skin");
+        if (settings.isConfigurationSection("npc") && !playerNpc) {
+            plugin.getSLF4JLogger().warn("captain: 'npc' needs the FancyNpcs plugin and modules.fancy-npcs; "
+                    + "the captain is shown as {} instead", mob.kind());
+        }
 
         return EventActions.forEvent(event -> {
             EventideSettings.Keys keys = plugin.settings().modules().keys();
@@ -72,23 +80,38 @@ final class CaptainAction implements ActionFactory {
             }
             Location spot = Spots.randomSurface(event.location(), spread);
             if (spot == null) {
-                spot = event.location();
+                spot = event.location().clone();
             }
-            LivingEntity npc = mob.spawn(event, spot, plugin.text());
-            npc.setAI(false);
-            npc.setSilent(true);
-            npc.setInvulnerable(true);
-            npc.setCollidable(false);
-            plugin.playEffect(spawnEffect, spot);
-
             Captain captain = new Captain(event, task, rarityId, perPlayer, points, dialog, rewardEffect,
                     settings.getInt("radius", event.reach() + 16));
-            event.claim(npc, captain);
+            if (playerNpc) {
+                // Faces the event, so players walking up see the captain's face, not his back.
+                Vector toEvent = event.location().toVector().subtract(spot.toVector()).setY(0);
+                if (toEvent.lengthSquared() > 0) {
+                    spot.setDirection(toEvent);
+                }
+                Runnable remove = FancyNpcs.spawn(plugin, spot, mob.name() == null ? "Captain" : mob.name(), skin,
+                        plugin.settings().modules().mobGlow() ? mob.glow() : null, captain::interacted);
+                event.addPart(remove::run);
+            } else {
+                LivingEntity npc = mob.spawn(event, spot, plugin.text());
+                npc.setAI(false);
+                npc.setSilent(true);
+                npc.setInvulnerable(true);
+                npc.setCollidable(false);
+                event.claim(npc, captain);
+            }
+            plugin.playEffect(spawnEffect, spot);
             if (task.kind() == Kind.KILL) {
                 Bukkit.getPluginManager().registerEvents(captain, plugin);
                 event.addPart(() -> HandlerList.unregisterAll(captain));
             }
         });
+    }
+
+    private boolean fancyNpcsReady() {
+        return plugin.settings().modules().fancyNpcs()
+                && plugin.getServer().getPluginManager().isPluginEnabled(FancyNpcs.PLUGIN);
     }
 
     private record Task(Kind kind, int count, Set<EntityType> victims, Material item) {

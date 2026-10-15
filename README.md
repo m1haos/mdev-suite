@@ -75,7 +75,7 @@ gradlew :eventide:runServerLegacy → то же на 1.21.8 (папка run/1.21
 
 ## Действия этапов
 
-- `captain`: NPC-капитан даёт ключ редкости `rarity` за задание. `task: {type: kill, count: 5, entities: [zombie]}` (убить мобов рядом с ивентом, без `entities` любых монстров), `{type: bring, item: iron_ingot, count: 16}` (принести предметы) или без `task` (ключ за разговор). `per-player` — сколько ключей даст одному игроку, `dialog` — реплики при первом разговоре, `entity` и `name` как у стражей. Выключается `modules.keys.captain`.
+- `captain`: NPC-капитан даёт ключ редкости `rarity` за задание. `task: {type: kill, count: 5, entities: [zombie]}` (убить мобов рядом с ивентом, без `entities` любых монстров), `{type: bring, item: iron_ingot, count: 16}` (принести предметы) или без `task` (ключ за разговор). `per-player` — сколько ключей даст одному игроку, `dialog` — реплики при первом разговоре, `entity` и `name` как у стражей. `npc: {skin: Notch}` показывает капитана игроком FancyNpcs с этим скином (нужен плагин FancyNpcs и `modules.fancy-npcs`), без него капитан остаётся мобом из `entity`. Выключается `modules.keys.captain`.
 - Ядро: `broadcast`, `title`, `actionbar`, `sound`, `command`, `effect`.
 - Eventide: `countdown`, `marker`, `spawn-loot`, `spawn-guards`, `airdrop`, `capture-zone`, `waves`, `boss`, `captain`, `collect`.
 - `collect`: блоки вокруг места (тыквы, подарки), игрок берёт их кликом или ударом и получает очки; новые появляются по таймеру, часть может быть «проклятой» (больше очков, из блока вылезают мобы). `goal` даёт сигнал `collect-won`.
@@ -119,4 +119,4 @@ MDevCore хранит счётчики игроков: `plugins/MDevCore/data.db
 
 - При падении сервера во время ивента Eventide пишет занятые блоки (тайники, ящики, тыквы) в `loose-blocks.yml` раз в 5 секунд и убирает их при следующем старте, если на месте всё ещё тот же блок. Мобы ивента не сохраняются в мире и пропадают сами.
 - Редактор меняет список `loot:` уровня целиком, поэтому комментарии внутри этого списка после правки пропадают. Комментарии в остальном файле остаются.
-- MythicMobs, предметы ItemsAdder/Nexo и NPC из Citizens/FancyNpcs — следующие этапы.
+- Проверены в игре MythicMobs 5.13, CraftEngine 26.9 и FancyNpcs 2.12. ItemsAdder и Nexo поддерживаются тем же кодом, что CraftEngine, но в игре не проверялись. Citizens не поддерживается.
