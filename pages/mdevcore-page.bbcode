@@ -1,0 +1,14 @@
+[SIZE=5][B]MDevCore[/B][/SIZE]
+The shared core of M/Dev Studio plugins. On its own it adds nothing to the game: install it when a plugin such as Eventide asks for it.
+
+[COLOR=#cc0000][B]Paper only.[/B][/COLOR] Paper 1.21.8 or newer, including 26.x, Java 21.
+
+[SIZE=4][B]What it gives the plugins that use it[/B][/SIZE]
+[LIST]
+[*]An effect library: animations in plugins/MDevCore/effects/*.yml, used by name. /mdevcore effect <name> plays one where you stand, /mdevcore effects lists them.
+[*]Reward lines shared by all studio plugins: command, message, broadcast, xp, item, sound, effect, money (Vault).
+[*]Player statistics in SQLite (default) or MySQL/MariaDB.
+[*]Items from config with custom items of CraftEngine, ItemsAdder and Nexo.
+[/LIST]
+
+Source code: https://github.com/m1haos/mdev-suite

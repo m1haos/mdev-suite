@@ -1,0 +1,114 @@
+[CENTER][IMG]https://raw.githubusercontent.com/m1haos/mdev-suite/assets/spigot/banner.png[/IMG]
+
+[SIZE=4]Server events built from stages: a meteor with guarded caches, an airdrop, king of the hill and a siege with a boss.
+Every event is a YAML file. Change the bundled ones or write your own, no code needed.[/SIZE]
+
+[COLOR=#e74c3c][B]Paper only.[/B][/COLOR] Paper 1.21.8 or newer, including 26.x, Java 21. Tested on Paper 26.2 and 1.21.8. Does not run on plain Spigot.
+[B]Requires [URL='MDEVCORE_URL']MDevCore[/URL][/B], the shared core with effects, rewards and storage.
+
+[URL='https://github.com/m1haos/mdev-suite'][B]Source code[/B][/URL]  •  [URL='https://github.com/m1haos/mdev-suite/issues'][B]Report a bug[/B][/URL]  •  [URL='https://github.com/m1haos/mdev-suite#readme'][B]Full docs[/B][/URL][/CENTER]
+
+[IMG]https://raw.githubusercontent.com/m1haos/mdev-suite/assets/spigot/h_events.png[/IMG]
+
+[CENTER][SIZE=5][B][COLOR=#ff8a5c]Meteor[/COLOR][/B][/SIZE]
+A meteor falls on a random spot. Caches of three tiers lie around the crater, guards drop the keys, and a captain gives one more key for a small task.
+[IMG]https://raw.githubusercontent.com/m1haos/mdev-suite/assets/spigot/meteor_fall.gif[/IMG]
+
+[SIZE=5][B][COLOR=#5dade2]Airdrop[/COLOR][/B][/SIZE]
+A crate falls from the sky with a smoke trail. Stand next to it alone for 30 seconds to open it; anyone else nearby stops the timer.
+[IMG]https://raw.githubusercontent.com/m1haos/mdev-suite/assets/spigot/cargo_drop.gif[/IMG] [IMG]https://raw.githubusercontent.com/m1haos/mdev-suite/assets/spigot/cargo_open.gif[/IMG]
+
+[SIZE=5][B][COLOR=#b084f5]King of the hill[/COLOR][/B][/SIZE]
+Every second alone in the zone is a point. The leader is on the boss bar, the holder glows for everyone.
+[IMG]https://raw.githubusercontent.com/m1haos/mdev-suite/assets/spigot/hill_zone.gif[/IMG]
+
+[SIZE=5][B][COLOR=#ff6b6b]Siege[/COLOR][/B][/SIZE]
+A fortress goes up on the spot, three waves attack, then a boss with phases. The ground under the fortress is put back when the event ends.
+[IMG]https://raw.githubusercontent.com/m1haos/mdev-suite/assets/spigot/siege_fort.gif[/IMG] [IMG]https://raw.githubusercontent.com/m1haos/mdev-suite/assets/spigot/siege_wave.gif[/IMG]
+[IMG]https://raw.githubusercontent.com/m1haos/mdev-suite/assets/spigot/siege_boss.gif[/IMG][/CENTER]
+
+[IMG]https://raw.githubusercontent.com/m1haos/mdev-suite/assets/spigot/h_features.png[/IMG]
+
+[LIST]
+[*][B]Keys by rarity.[/B] Caches open with a key of their rarity. Keys drop from guards, come as rewards, are sold through Vault, or given by the captain NPC. Each source has its own switch.
+[*][B]Your own rarities and loot.[/B] Add any number of rarities in rarities.yml. Fill loot tables in game with [I]/eventide loot[/I]: dialog windows, item from your hand, sliders for weight and amount.
+[*][B]Schedule and random events.[/B] Start times in your time zone, plus a random roll every 90 minutes by default: rarities with chances and cooldowns, time windows, a minimum online.
+[*][B]Builds with rollback.[/B] A structure goes up on the event spot and the ground under it comes back afterwards, also after a crash. Blocks left by a crashed event are cleared on the next start.
+[*][B]Safe spots.[/B] The spot is checked for slopes, water, trees and player builds. Events never start on claimed land, and a region around a running event blocks building, buckets, explosions and /sethome.
+[*][B]Easy to find.[/B] A beam over the spot, distance and direction in the action bar, boss bars with timers and leaders, glowing guards and bosses.
+[*][B]Effects.[/B] Rings, helixes, shockwaves, falling meteors and fireworks from a shared library. Preview any with [I]/mdevcore effect <name>[/I].
+[*][B]Everything can be turned off.[/B] Every system has a switch in the modules section of config.yml, every command and subcommand has aliases you set yourself.
+[*][B]Two languages.[/B] English and Russian, each player sees their client language.
+[/LIST]
+
+[IMG]https://raw.githubusercontent.com/m1haos/mdev-suite/assets/spigot/h_file.png[/IMG]
+
+[CODE=YAML]stages:
+  - actions:
+      - type: broadcast
+        message: "<gray>A meteor falls at <white><x> <z></white> in 5 minutes."
+      - type: countdown
+        duration: 5m
+  - after: 5m
+    actions:
+      - type: spawn-loot
+        containers: {common: 6, rare: 3, epic: 1}
+      - type: spawn-guards
+        entity: zombie
+        count: 10
+        key-drops: {common: 60, rare: 30, epic: 10}
+      - type: captain
+        name: "<aqua>Scout captain"
+        rarity: rare
+        task: {type: kill, count: 5}[/CODE]
+Stage actions: [I]countdown, marker, spawn-loot, spawn-guards, airdrop, capture-zone, waves, boss, captain, collect, broadcast, title, actionbar, sound, command, effect[/I]. A stage can wait for a signal ([I]boss-killed, waves-cleared, zone-won[/I] and others) instead of a timer, and an event can end on one.
+
+[IMG]https://raw.githubusercontent.com/m1haos/mdev-suite/assets/spigot/h_commands.png[/IMG]
+
+[TABLE]
+[TR][TH]Command[/TH][TH]What it does[/TH][TH]Permission[/TH][/TR]
+[TR][TD]/eventide (/ev)[/TD][TD]Schedule and running events[/TD][TD]everyone[/TD][/TR]
+[TR][TD]/eventide tp [event][/TD][TD]Teleport to a running event[/TD][TD]eventide.command.tp[/TD][/TR]
+[TR][TD]/eventide start <event>[/TD][TD]Start now[/TD][TD]eventide.admin[/TD][/TR]
+[TR][TD]/eventide stop <event>[/TD][TD]Stop without rewards[/TD][TD]eventide.admin[/TD][/TR]
+[TR][TD]/eventide givekey <player> <rarity> [amount][/TD][TD]Give a key[/TD][TD]eventide.admin[/TD][/TR]
+[TR][TD]/eventide buykey <rarity> [amount][/TD][TD]Buy a key with Vault money[/TD][TD]eventide.command.buykey[/TD][/TR]
+[TR][TD]/eventide loot[/TD][TD]Loot editor[/TD][TD]eventide.admin[/TD][/TR]
+[TR][TD]/eventide random [pause|resume|roll][/TD][TD]Random events[/TD][TD]eventide.admin[/TD][/TR]
+[TR][TD]/eventide reload[/TD][TD]Reload configs, events and loot[/TD][TD]eventide.admin[/TD][/TR]
+[/TABLE]
+
+[IMG]https://raw.githubusercontent.com/m1haos/mdev-suite/assets/spigot/h_placeholders.png[/IMG]
+
+With PlaceholderAPI. Statistics are kept in SQLite or MySQL.
+[LIST]
+[*]%eventide_next%, %eventide_next_time%, %eventide_next_in%, %eventide_next_random%
+[*]%eventide_active%, %eventide_active_x%, %eventide_active_z%, %eventide_active_world%
+[*]%eventide_points%, %eventide_leader%, %eventide_leader_points%
+[*]%eventide_wins%, %eventide_played%, %eventide_total_points%, %eventide_caches%, %eventide_bosses%
+[*]%eventide_top_wins_1_name%, %eventide_top_points_1_value% and so on, top 10
+[/LIST]
+
+[IMG]https://raw.githubusercontent.com/m1haos/mdev-suite/assets/spigot/h_integrations.png[/IMG]
+
+[LIST]
+[*][B]PlaceholderAPI[/B], [B]Vault[/B]: placeholders, key shop, money rewards
+[*][B]WorldGuard, GriefPrevention, Lands, Towny[/B]: events stay off claimed land
+[*][B]MythicMobs[/B]: [I]mythic:<id>[/I] for guards, waves, bosses and the captain (tested with 5.13)
+[*][B]CraftEngine, ItemsAdder, Nexo[/B]: custom items anywhere an item is written (tested with CraftEngine 26.9)
+[*][B]FancyNpcs[/B]: the captain as a player NPC with a skin (tested with 2.12)
+[/LIST]
+None of them is required.
+
+[IMG]https://raw.githubusercontent.com/m1haos/mdev-suite/assets/spigot/h_install.png[/IMG]
+
+[LIST=1]
+[*]Download [URL='MDEVCORE_URL']MDevCore[/URL] and Eventide, put both into [I]plugins[/I], start the server.
+[*]Set the world and the search area in [I]plugins/Eventide/events/*.yml[/I].
+[*]Try it right away: [I]/eventide start airdrop[/I]
+[/LIST]
+
+[IMG]https://raw.githubusercontent.com/m1haos/mdev-suite/assets/spigot/h_support.png[/IMG]
+
+Source code is open: [URL='https://github.com/m1haos/mdev-suite']github.com/m1haos/mdev-suite[/URL]
+Bugs and ideas: the discussion tab of this resource or [URL='https://github.com/m1haos/mdev-suite/issues']GitHub issues[/URL]. Please include your Paper version and the console log.
