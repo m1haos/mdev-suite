@@ -43,11 +43,13 @@ gradlew :eventide:runServerLegacy → то же на 1.21.8 (папка run/1.21
 | `/eventide` (`/ev`) | Расписание и идущие ивенты | все |
 | `/eventide help` | Список команд с алиасами | все |
 | `/eventide start <ивент>` | Запустить сейчас | `eventide.admin` |
-| `/eventide stop <ивент>` | Остановить, раздать награды по текущим очкам | `eventide.admin` |
+| `/eventide stop <ивент>` | Остановить без наград и статистики | `eventide.admin` |
+| `/eventide tp [ивент]` | Телепорт к идущему ивенту; без имени, если идёт несколько, список | `eventide.command.tp` |
 | `/eventide givekey <игрок> <редкость> [кол-во]` | Выдать ключ | `eventide.admin` |
 | `/eventide buykey <редкость> [кол-во]` | Купить ключ за валюту Vault (если включено `modules.keys.shop`) | `eventide.command.buykey` |
 | `/eventide loot` | Редактор лута в диалоговых окнах | `eventide.admin` |
 | `/eventide reload` | Перечитать конфиги, ивенты, лут | `eventide.admin` |
+| `/eventide random [pause\|resume\|roll]` | Случайные ивенты: следующий бросок и кулдауны, пауза, бросок сейчас | `eventide.admin` |
 
 ## Редкости и ключи
 
