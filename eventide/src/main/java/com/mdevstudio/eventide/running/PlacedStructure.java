@@ -21,6 +21,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.structure.Mirror;
 import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.structure.Structure;
 import org.bukkit.util.BlockVector;
@@ -91,6 +92,7 @@ public final class PlacedStructure {
         fillUnder(spec.structure(), buildCorner, depth);
         PlacedStructure placed = new PlacedStructure(plugin, corner, original, backup, note);
         placed.freeTrappedPlayers();
+        placed.removeFreshDrops();
         return placed;
     }
 
@@ -155,6 +157,7 @@ public final class PlacedStructure {
     void restore() {
         original.place(corner, false, StructureRotation.NONE, Mirror.NONE, 0, 1, ThreadLocalRandom.current());
         freeTrappedPlayers();
+        removeFreshDrops();
         // Without the note the copy is never placed again, so a later start cannot roll the area back twice.
         if (!note.delete() && note.exists()) {
             plugin.getSLF4JLogger().error("Could not delete {}/{}. Delete it by hand before the next start, "
@@ -181,6 +184,14 @@ public final class PlacedStructure {
             at.setY(world.getHighestBlockYAt(feet.getX(), feet.getZ()) + 1);
             player.teleport(at);
         }
+    }
+
+    // Grass, flowers and torches lose their support when the build goes up or comes down and pop off as
+    // items in the same tick. Left alone they litter the yard and hand out free seeds and flowers.
+    private void removeFreshDrops() {
+        Location center = corner.clone().add(size.getX() / 2, size.getY() / 2, size.getZ() / 2);
+        world.getNearbyEntitiesByType(Item.class, center, size.getX() / 2 + 2, size.getY() / 2 + 2,
+                size.getZ() / 2 + 2, item -> item.getTicksLived() <= 1).forEach(Item::remove);
     }
 
     private CompletableFuture<Void> loadChunks() {
