@@ -16,7 +16,8 @@ location:
   world: world
   # Center of the search area, x and z.
   center: [0, 0]
-  # How far from the center the event may land, in blocks: [min, max].
+  # How far from the center the event may land, in blocks: [min, max]. One number is an exact
+  # distance, so "radius: 0" always puts the event right at the center.
   radius: [300, 1500]
 
 # File in the loot folder, without .yml.

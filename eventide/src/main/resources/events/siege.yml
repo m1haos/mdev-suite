@@ -11,6 +11,8 @@ random: {rarity: epic, weight: 10, cooldown: 6h, min-online: 5}
 location:
   world: world
   center: [0, 0]
+  # A random spot this many blocks from the center, [min, max]. "radius: 0" builds the fortress
+  # right at the center every time.
   radius: [200, 1200]
   # A spot that fits the whole fortress is rarer than a spot for a crate, so more tries.
   attempts: 40

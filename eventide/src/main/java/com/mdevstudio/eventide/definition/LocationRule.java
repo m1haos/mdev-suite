@@ -37,7 +37,10 @@ public record LocationRule(String world, int centerX, int centerZ, int minRadius
             throw new IllegalArgumentException("'location' is required");
         }
         List<Integer> center = section.getIntegerList("center");
-        List<Integer> radius = section.getIntegerList("radius");
+        // A single number is an exact distance, so "radius: 0" pins the event to the center.
+        List<Integer> radius = section.isInt("radius")
+                ? List.of(section.getInt("radius"), section.getInt("radius"))
+                : section.getIntegerList("radius");
         int min = radius.isEmpty() ? 0 : radius.getFirst();
         int max = radius.size() > 1 ? radius.get(1) : Math.max(min, 500);
         if (max < min) {
