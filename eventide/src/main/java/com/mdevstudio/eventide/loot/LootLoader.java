@@ -9,15 +9,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import com.mdevstudio.core.MDevCore;
 import com.mdevstudio.core.item.ItemSpec;
+import com.mdevstudio.core.reward.RewardRegistry;
 import com.mdevstudio.core.util.Sections;
 import com.mdevstudio.core.util.WeightedPool;
+import com.mdevstudio.eventide.EventidePlugin;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public final class LootLoader {
 
@@ -26,7 +26,7 @@ public final class LootLoader {
     private LootLoader() {
     }
 
-    public static Map<String, LootTable> loadAll(JavaPlugin plugin, Map<String, Rarity> rarities) {
+    public static Map<String, LootTable> loadAll(EventidePlugin plugin, Map<String, Rarity> rarities) {
         File folder = new File(plugin.getDataFolder(), "loot");
         if (!folder.exists()) {
             EXAMPLES.forEach(path -> plugin.saveResource(path, false));
@@ -40,7 +40,8 @@ public final class LootLoader {
         for (File file : files) {
             String id = file.getName().substring(0, file.getName().length() - 4).toLowerCase(Locale.ROOT);
             try {
-                tables.put(id, parse(id, file, YamlConfiguration.loadConfiguration(file), rarities));
+                tables.put(id, parse(id, file, YamlConfiguration.loadConfiguration(file), rarities,
+                        plugin.rewards()));
             } catch (IllegalArgumentException e) {
                 plugin.getSLF4JLogger().error("loot/{}: {}", file.getName(), e.getMessage());
             }
@@ -48,7 +49,8 @@ public final class LootLoader {
         return tables;
     }
 
-    private static LootTable parse(String id, File file, YamlConfiguration yaml, Map<String, Rarity> rarities) {
+    private static LootTable parse(String id, File file, YamlConfiguration yaml, Map<String, Rarity> rarities,
+            RewardRegistry rewardTypes) {
         ConfigurationSection tiersSection = yaml.getConfigurationSection("tiers");
         if (tiersSection == null) {
             throw new IllegalArgumentException("'tiers' is required");
@@ -60,7 +62,7 @@ public final class LootLoader {
                 if (rarity == null) {
                     throw new IllegalArgumentException("there is no rarity '" + tierId + "' in rarities.yml");
                 }
-                tiers.put(tierId, parseTier(rarity, tiersSection.getConfigurationSection(tierId)));
+                tiers.put(tierId, parseTier(rarity, tiersSection.getConfigurationSection(tierId), rewardTypes));
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("tiers." + tierId + ": " + e.getMessage(), e);
             }
@@ -69,7 +71,7 @@ public final class LootLoader {
     }
 
     // Name, block, points and effects may be overridden per table; the key always belongs to the rarity.
-    private static LootTier parseTier(Rarity rarity, ConfigurationSection section) {
+    private static LootTier parseTier(Rarity rarity, ConfigurationSection section, RewardRegistry rewardTypes) {
         Material block = section.contains("block") ? RarityLoader.block(section.getString("block")) : rarity.block();
         int[] rolls = range(section.getString("rolls", "1"));
 
@@ -82,7 +84,7 @@ public final class LootLoader {
                 ItemSpec item = entry.contains("item") ? ItemSpec.parse(entry, "item") : null;
                 ItemStack stack = entry.contains("item-data") ? decode(entry.getString("item-data")) : null;
                 int[] amount = range(entry.getString("amount", "1"));
-                var rewards = MDevCore.rewards().parseAll(entry.getStringList("rewards"));
+                var rewards = rewardTypes.parseAll(entry.getStringList("rewards"));
                 if (item == null && stack == null && rewards.isEmpty()) {
                     throw new IllegalArgumentException("needs 'item', 'item-data' or 'rewards'");
                 }

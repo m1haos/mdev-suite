@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.mdevstudio.core.MDevCore;
 import com.mdevstudio.core.scenario.ActionFactory;
 import com.mdevstudio.core.scenario.ScenarioAction;
 import com.mdevstudio.core.util.Sections;
@@ -86,7 +85,7 @@ final class BossAction implements ActionFactory {
         return EventActions.forEvent(event -> new Boss(event, settings).spawn());
     }
 
-    private static Phase parsePhase(ConfigurationSection phase) {
+    private Phase parsePhase(ConfigurationSection phase) {
         String at = phase.getString("at", "");
         double share;
         try {
@@ -99,7 +98,7 @@ final class BossAction implements ActionFactory {
         }
         List<ScenarioAction> actions = new ArrayList<>();
         for (Map<?, ?> raw : phase.getMapList("actions")) {
-            actions.add(MDevCore.actions().create(Sections.fromMap(raw)));
+            actions.add(plugin.actions().create(Sections.fromMap(raw)));
         }
         return new Phase(share, phase.getDouble("damage", 0), phase.getDouble("speed", 0),
                 phase.getString("effect"), List.copyOf(actions));

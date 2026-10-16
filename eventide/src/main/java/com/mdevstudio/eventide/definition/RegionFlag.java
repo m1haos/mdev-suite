@@ -20,6 +20,7 @@ public enum RegionFlag {
     MOB_GRIEFING,
     MOB_SPAWNING,
     PVP,
+    DAMAGE,
     ENDER_PEARLS;
 
     /** Always forbidden inside an event build: it is rolled back at the end, so changes there are dupes or losses. */

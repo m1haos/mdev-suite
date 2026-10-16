@@ -15,6 +15,7 @@ container:
 
 region:
   denied: "<prefix><error>The event <event> <error>is running here; this is not allowed until it ends."
+  pvp-after-end: "<prefix><error><event><error> has just ended, PvP here is back in <white><seconds> s</white>."
   command-blocked: "<prefix><error>This command does not work at the event <event><error>."
 
 build:

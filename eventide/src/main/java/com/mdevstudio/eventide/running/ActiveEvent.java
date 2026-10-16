@@ -129,6 +129,14 @@ public final class ActiveEvent implements ScenarioContext {
                 || RegionFlag.BUILD.contains(flag) && inBuild(at, 0);
     }
 
+    public Area region() {
+        return region;
+    }
+
+    public boolean keepsInventory(Location at) {
+        return definition.region().keepInventory() && region.contains(at);
+    }
+
     public boolean blocksCommand(Location at, String command) {
         return definition.region().blocks(command) && region.contains(at);
     }

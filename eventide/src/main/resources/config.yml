@@ -239,6 +239,8 @@ event-region:
   #   mob-griefing     endermen, ravagers, withers and other mobs changing blocks
   #   mob-spawning     natural mobs, patrols and spawners; event mobs are not affected
   #   pvp              players hurting each other
+  #   damage           players taking any damage at all (void and /kill still work). Off by default:
+  #                    a fight in the region would lose its point. Separate from pvp
   #   ender-pearls     ender pearls and chorus fruit taking players into the region
   # An event build forbids break, place, buckets, containers, explosions, fire, pistons, fluids
   # and mob-griefing inside itself anyway: it is rolled back at the end.
@@ -247,6 +249,14 @@ event-region:
   # Commands players cannot use inside, without the slash. Add the names other plugins use
   # for the same thing, e.g. createhome or addhome.
   blocked-commands: [sethome, createhome, setwarp]
+
+  # A player who dies inside keeps items and experience: nothing drops, the death screen is as usual.
+  # Elsewhere on the server deaths are not touched. Can be set per event in "region" of the event file.
+  keep-inventory: false
+
+  # After the event ends, players still cannot hurt each other in the region for this long, so the winners
+  # get away with the loot. Works whether or not pvp is in deny. 0 = PvP comes back at once.
+  pvp-after-end: 0
 
 
 # Events never start on claimed land, and their region never reaches it: otherwise the region would

@@ -12,13 +12,12 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import com.mdevstudio.core.MDevCore;
 import com.mdevstudio.core.reward.Reward;
 import com.mdevstudio.core.scenario.Scenario;
+import com.mdevstudio.eventide.EventidePlugin;
 import com.mdevstudio.eventide.EventideSettings;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public final class EventLoader {
 
@@ -30,7 +29,7 @@ public final class EventLoader {
     }
 
     // A broken file is reported and skipped; the other events still load.
-    public static Map<String, EventDefinition> loadAll(JavaPlugin plugin, EventideSettings settings) {
+    public static Map<String, EventDefinition> loadAll(EventidePlugin plugin, EventideSettings settings) {
         File folder = new File(plugin.getDataFolder(), "events");
         if (!folder.exists()) {
             EXAMPLES.forEach(path -> plugin.saveResource(path, false));
@@ -48,7 +47,7 @@ public final class EventLoader {
         for (File file : files) {
             String id = file.getName().substring(0, file.getName().length() - 4).toLowerCase(Locale.ROOT);
             try {
-                definitions.put(id, parse(id, YamlConfiguration.loadConfiguration(file), settings,
+                definitions.put(id, parse(plugin, id, YamlConfiguration.loadConfiguration(file), settings,
                         settings.modules().structures() ? structureFolder : null));
             } catch (IllegalArgumentException e) {
                 plugin.getSLF4JLogger().error("events/{}: {}. The event is disabled until fixed.",
@@ -59,8 +58,8 @@ public final class EventLoader {
     }
 
     // structures is null when the module is off: builds in event files are then ignored.
-    private static EventDefinition parse(String id, YamlConfiguration yaml, EventideSettings settings,
-            File structures) {
+    private static EventDefinition parse(EventidePlugin plugin, String id, YamlConfiguration yaml,
+            EventideSettings settings, File structures) {
         List<LocalTime> schedule = new ArrayList<>();
         for (String time : yaml.getStringList("schedule")) {
             try {
@@ -70,7 +69,7 @@ public final class EventLoader {
             }
         }
 
-        var rewards = MDevCore.rewards();
+        var rewards = plugin.rewards();
         Map<Integer, List<Reward>> places = new TreeMap<>();
         ConfigurationSection placeSection = yaml.getConfigurationSection("rewards.places");
         if (placeSection != null) {
@@ -119,6 +118,6 @@ public final class EventLoader {
                 yaml.getStringList("finish-on").stream()
                         .map(signal -> signal.trim().toLowerCase(Locale.ROOT))
                         .collect(Collectors.toUnmodifiableSet()),
-                Scenario.parse(yaml.getMapList("stages"), MDevCore.actions()));
+                Scenario.parse(yaml.getMapList("stages"), plugin.actions()));
     }
 }

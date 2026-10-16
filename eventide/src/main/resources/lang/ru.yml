@@ -15,6 +15,7 @@ container:
 
 region:
   denied: "<prefix><error>Здесь идёт ивент <event><error>, это нельзя делать до его конца."
+  pvp-after-end: "<prefix><error>Ивент <event><error> только что закончился, PvP здесь включится через <white><seconds> с</white>."
   command-blocked: "<prefix><error>Эта команда не работает на месте ивента <event><error>."
 
 build:

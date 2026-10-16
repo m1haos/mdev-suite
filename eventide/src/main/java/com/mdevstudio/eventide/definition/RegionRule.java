@@ -1,5 +1,6 @@
 package com.mdevstudio.eventide.definition;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
@@ -7,13 +8,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import com.mdevstudio.core.util.Durations;
 import org.bukkit.configuration.ConfigurationSection;
 
 /**
  * The area around a running event where players and the world are limited. {@code radius} 0 means
  * the event area plus {@link #AUTO_MARGIN}.
  */
-public record RegionRule(int radius, int below, int above, Set<RegionFlag> deny, Set<String> blockedCommands) {
+public record RegionRule(int radius, int below, int above, Set<RegionFlag> deny, Set<String> blockedCommands,
+                         boolean keepInventory, Duration pvpAfterEnd) {
 
     // Caches and guards land up to about 24 blocks from the spot; a region that stops short of them protects nothing.
     private static final int AUTO_MARGIN = 16;
@@ -43,21 +46,31 @@ public record RegionRule(int radius, int below, int above, Set<RegionFlag> deny,
         if (section.contains("blocked-commands")) {
             commands = commandNames(section.getStringList("blocked-commands"));
         }
+        Duration pvpAfterEnd = base.pvpAfterEnd();
+        if (section.contains("pvp-after-end")) {
+            try {
+                pvpAfterEnd = Durations.parse(section.getString("pvp-after-end", "0"));
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("pvp-after-end: " + e.getMessage());
+            }
+        }
         return new RegionRule(
                 Math.max(0, section.getInt("radius", base.radius())),
                 Math.max(0, section.getInt("below", base.below())),
                 Math.max(0, section.getInt("above", base.above())),
                 deny,
-                commands);
+                commands,
+                section.getBoolean("keep-inventory", base.keepInventory()),
+                pvpAfterEnd);
     }
 
     public RegionRule resolve(int areaRadius) {
-        return radius > 0 ? this : new RegionRule(areaRadius + AUTO_MARGIN, below, above, deny, blockedCommands);
+        return radius > 0 ? this : new RegionRule(areaRadius + AUTO_MARGIN, below, above, deny, blockedCommands, keepInventory, pvpAfterEnd);
     }
 
     /** The same area with nothing forbidden, for when the event-region module is off. */
     public RegionRule permissive() {
-        return new RegionRule(radius, below, above, Set.of(), Set.of());
+        return new RegionRule(radius, below, above, Set.of(), Set.of(), false, Duration.ZERO);
     }
 
     public boolean blocks(String command) {

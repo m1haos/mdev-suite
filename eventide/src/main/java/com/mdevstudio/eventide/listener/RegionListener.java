@@ -9,6 +9,7 @@ import java.util.Set;
 import com.mdevstudio.eventide.EventidePlugin;
 import com.mdevstudio.eventide.definition.RegionFlag;
 import com.mdevstudio.eventide.running.ActiveEvent;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -32,6 +33,9 @@ import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
@@ -199,6 +203,33 @@ public final class RegionListener implements Listener {
                 && EventListener.attackerOf(event.getDamager()) instanceof Player attacker
                 && !attacker.equals(victim)) {
             refuse(event, attacker, victim.getLocation(), RegionFlag.PVP);
+            if (!event.isCancelled() && !attacker.hasPermission(BYPASS_PERMISSION)) {
+                plugin.manager().pvpAfterEnd(victim.getLocation()).ifPresent(protection -> {
+                    event.setCancelled(true);
+                    plugin.messages().send(attacker, "region.pvp-after-end", protection.placeholders(),
+                            Placeholder.unparsed("seconds", Long.toString(protection.secondsLeft())));
+                });
+            }
+        }
+    }
+
+    // Void and /kill stay deadly, or a player stuck in the region would have no way out.
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onDamage(EntityDamageEvent event) {
+        DamageCause cause = event.getCause();
+        if (event.getEntity() instanceof Player && cause != DamageCause.VOID && cause != DamageCause.KILL
+                && cause != DamageCause.SUICIDE && forbids(event.getEntity().getLocation(), RegionFlag.DAMAGE)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onDeath(PlayerDeathEvent event) {
+        if (plugin.manager().keepsInventory(event.getPlayer().getLocation())) {
+            event.setKeepInventory(true);
+            event.setKeepLevel(true);
+            event.getDrops().clear();
+            event.setDroppedExp(0);
         }
     }
 

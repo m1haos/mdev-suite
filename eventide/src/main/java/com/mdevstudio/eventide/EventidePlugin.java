@@ -8,6 +8,8 @@ import java.util.Optional;
 import com.mdevstudio.core.MDevCore;
 import com.mdevstudio.core.config.Messages;
 import com.mdevstudio.core.config.YamlFile;
+import com.mdevstudio.core.reward.RewardRegistry;
+import com.mdevstudio.core.scenario.ActionRegistry;
 import com.mdevstudio.core.text.Text;
 import com.mdevstudio.eventide.action.EventActions;
 import com.mdevstudio.eventide.command.EventideCommand;
@@ -54,8 +56,8 @@ public final class EventidePlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         // Actions and the key reward are parsed from event and loot files, so they come before reload().
-        EventActions.registerAll(MDevCore.actions(), this);
-        MDevCore.rewards().register("key", value -> KeyReward.parse(this, value));
+        EventActions.registerAll(actions(), this);
+        rewards().register("key", value -> KeyReward.parse(this, value));
         manager = new EventManager(this);
         // Before anything can start: an area left from a server stop during an event goes back first.
         PlacedStructure.restoreLeftovers(this);
@@ -153,6 +155,14 @@ public final class EventidePlugin extends JavaPlugin {
 
     public Map<String, Rarity> rarities() {
         return rarities;
+    }
+
+    public ActionRegistry actions() {
+        return MDevCore.actions();
+    }
+
+    public RewardRegistry rewards() {
+        return MDevCore.rewards();
     }
 
     public Text text() {

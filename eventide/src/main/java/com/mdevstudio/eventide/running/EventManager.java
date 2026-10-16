@@ -19,6 +19,7 @@ import com.mdevstudio.eventide.api.EventideStartEvent;
 import com.mdevstudio.eventide.definition.EventDefinition;
 import com.mdevstudio.eventide.definition.RegionFlag;
 import com.mdevstudio.eventide.loot.LootTable;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -39,9 +40,21 @@ public final class EventManager {
     private final Map<String, ActiveEvent> active = new LinkedHashMap<>();
     private final Set<String> starting = new HashSet<>();
     private final Map<ChunkKey, Integer> heldChunks = new HashMap<>();
+    private final List<PvpProtection> pvpAfterEnd = new ArrayList<>();
+    private final TakenAreas takenAreas;
 
     public EventManager(EventidePlugin plugin) {
         this.plugin = plugin;
+        this.takenAreas = new TakenAreas(plugin);
+        takenAreas.clearOwn();
+    }
+
+    /** The region of an ended event, where players still cannot hurt each other until {@code until}. */
+    public record PvpProtection(Area region, TagResolver placeholders, long until) {
+
+        public long secondsLeft() {
+            return Math.max(1, (until - System.currentTimeMillis() + 999) / 1000);
+        }
     }
 
     // The spot is found asynchronously; onFailure tells a waiting command sender why nothing happened.
@@ -95,6 +108,7 @@ public final class EventManager {
                     }
                     ActiveEvent event = new ActiveEvent(plugin, definition, lootTable, location, build);
                     active.put(id, event);
+                    takenAreas.mark(id, location, event.reach());
                     plugin.randomEvents().eventStarted(definition);
                     event.begin();
                 }));
@@ -116,6 +130,13 @@ public final class EventManager {
 
     void remove(ActiveEvent event) {
         active.remove(event.definition().id(), event);
+        takenAreas.unmark(event.definition().id(), event.location().getWorld());
+        long now = System.currentTimeMillis();
+        pvpAfterEnd.removeIf(protection -> protection.until() <= now);
+        long protection = event.definition().region().pvpAfterEnd().toMillis();
+        if (protection > 0) {
+            pvpAfterEnd.add(new PvpProtection(event.region(), event.placeholders(), now + protection));
+        }
         releaseChunks(event.location(), event.definition());
     }
 
@@ -153,6 +174,17 @@ public final class EventManager {
         return active.values().stream().filter(event -> event.forbids(at, flag)).findFirst();
     }
 
+    public Optional<PvpProtection> pvpAfterEnd(Location at) {
+        long now = System.currentTimeMillis();
+        return pvpAfterEnd.stream()
+                .filter(protection -> protection.until() > now && protection.region().contains(at))
+                .findFirst();
+    }
+
+    public boolean keepsInventory(Location at) {
+        return active.values().stream().anyMatch(event -> event.keepsInventory(at));
+    }
+
     public Optional<ActiveEvent> blockingCommand(Location at, String command) {
         return active.values().stream().filter(event -> event.blocksCommand(at, command)).findFirst();
     }
@@ -174,7 +206,7 @@ public final class EventManager {
             int distance = Math.max(Math.abs(other.getBlockX() - spot.getBlockX()),
                     Math.abs(other.getBlockZ() - spot.getBlockZ()));
             return other.getWorld().equals(spot.getWorld()) && distance < reach + event.reach() + AREA_GAP;
-        });
+        }) || takenAreas.takenByOthers(spot, reach, AREA_GAP);
     }
 
     public void playerJoined(Player player) {

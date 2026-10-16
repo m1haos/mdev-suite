@@ -1,6 +1,7 @@
 package com.mdevstudio.eventide;
 
 import java.time.DateTimeException;
+import java.time.Duration;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -206,7 +207,7 @@ public record EventideSettings(
                     : SurfaceRule.parse(yaml.getDefaults().getConfigurationSection("spot-check"), empty);
         }
 
-        RegionRule nothing = new RegionRule(0, 16, 64, Set.of(), Set.of());
+        RegionRule nothing = new RegionRule(0, 16, 64, Set.of(), Set.of(), false, Duration.ZERO);
         RegionRule eventRegion;
         try {
             eventRegion = RegionRule.parse(yaml.getConfigurationSection("event-region"), nothing);
